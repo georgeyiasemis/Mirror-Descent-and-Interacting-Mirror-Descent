@@ -187,22 +187,22 @@ def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float
 
 if __name__ == "__main__":
     eps = 1
-    max_iters = 100
-    N = 100
+    max_iters = 2000
+    N = 1000
     D = 3
     K = 10
-    lambd = 2
+    lambd = 1
     var = 1
     cluster_std = 1.5
-    cluster_random_state = 10
+    cluster_random_state = 0
     sigma = 0
-    seed = 1
+    seed = 0
     lr_gd = 0.0005
-    lr_md = 0.1
-    lr_imd = 0.1
+    lr_md = 0.005
+    lr_imd = 0.005
     decreasing_lr = True
-    Niid = 1
-    num_particles = 2
+    Niid = 5
+    num_particles = 5
 
     args_gd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
         'sigma': sigma, 'lr': lr_gd, 'eps': eps, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed}
@@ -215,8 +215,8 @@ if __name__ == "__main__":
     if not os.path.exists(path):
         os.mkdir(path)
     #
-    # losses_gd = run_GD(**args_gd)
-    # save_obj((losses_gd, args_gd), path + str(args_gd))
+    losses_gd = run_GD(**args_gd)
+    save_obj((losses_gd, args_gd), path + str(args_gd))
     losses_md = run_MD(**args_md)
     save_obj((losses_md, args_md), path + str(args_md))
     losses_imd = run_IMD(**args_imd)

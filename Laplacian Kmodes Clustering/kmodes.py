@@ -50,6 +50,10 @@ class LaplacianKmodes():
         assert isinstance(Z, torch.Tensor)
         assert len(Z.shape) == 2
 
+        # Run otpimisation for C for fixed Z with GD
+        for t in range(C_iters):
+            self.C -= eta_c / np.sqrt(t+1) * self.opt_C(Z, self.C)
+
         B = torch.zeros((self.N, self.K))
         for n in range(self.N):
             B[n] = torch.Tensor(normal.pdf(
@@ -66,9 +70,7 @@ class LaplacianKmodes():
             self.loss += self.sigma * torch.randn(1).item()
             self.gradient += self.sigma * torch.randn((self.K))
 
-        # Run otpimisation for C for fixed Z
-        for t in range(C_iters):
-            self.C -= eta_c * self.opt_C(Z, self.C)
+
 
 
     def opt_C(self, Z, C):
@@ -78,7 +80,7 @@ class LaplacianKmodes():
             X = (self.X - C[k]) / np.sqrt(self.var)
             norm = torch.pow(X,2).sum(1)
             G_norm = normal.pdf(norm)
-            grad_C[k] = (-2 * Z[:,k] * norm * G_norm) @ X
+            grad_C[k] = (-2 / self.var * Z[:,k] * norm * G_norm) @ X
         return grad_C
 
     def plot_3d_clusters(self):
