@@ -8,7 +8,7 @@ from kmodes import LaplacianKmodes
 from tqdm import tqdm,  trange
 
 def run_GD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float, cluster_random_state: int,
-        sigma: float, lr: float, eps=1, max_iters=1000, Niid=10, decreasing_lr=False, seed=None):
+        sigma: float, lr: float, eps=1, max_iters=1000, Niid=10, decreasing_lr=False, seed=None, mode='blobs'):
 
     assert sigma >= 0.0, "Sigma should be non negative."
     assert N > 0, "Number of samples should be a positive integer."
@@ -16,13 +16,14 @@ def run_GD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float,
     assert K > 0, "Number of clusters should be a positive integer."
     assert lambd > 0, "Lambda should be positive."
 
-    iters = [0 for i in range(max_iters)]
+    iters = {'loss': [0 for i in range(max_iters)], 'auc': [0 for i in range(max_iters)], 'accuracy': [0 for i in range(max_iters)]}
+
     if seed != None:
         torch.manual_seed(seed)
         np.random.seed(seed)
 
     lr_const = 1
-    kmodes = LaplacianKmodes(N, D, K, lambd, var, cluster_std, cluster_random_state, sigma)
+    kmodes = LaplacianKmodes(N, D, K, lambd, var, cluster_std, cluster_random_state, sigma, mode)
 
     print('GD')
     print('--')
@@ -39,7 +40,9 @@ def run_GD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float,
             Z_t = torch.ones((N, K)).float() / K
             kmodes.eval(Z_t)
 
-            iters[0] += kmodes.loss / Niid
+            iters['loss'][0] += kmodes.loss / Niid
+            iters['accuracy'][0] += kmodes.accuracy / Niid
+            iters['auc'][0] += kmodes.auc / Niid
 
             for t in range(1, max_iters):
                 if decreasing_lr:
@@ -54,14 +57,16 @@ def run_GD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float,
 
                 kmodes.eval(Z_t)
 
-                iters[t] += kmodes.loss / Niid
+                iters['loss'][t] += kmodes.loss / Niid
+                iters['accuracy'][t] += kmodes.accuracy / Niid
+                iters['auc'][t] += kmodes.auc / Niid
 
-            tqdm.set_postfix(Loss=iters[-1])
+            tqdm.set_postfix(Loss=iters['loss'][-1], Accuracy=iters['accuracy'][-1], AUC=iters['auc'][-1])
 
-    return iters
+    return iters, kmodes
 
 def run_MD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float, cluster_random_state: int,
-        sigma: float, lr: float, eps=1, max_iters=1000, Niid=10, decreasing_lr=False, seed=None):
+        sigma: float, lr: float, eps=1, max_iters=1000, Niid=10, decreasing_lr=False, seed=None, mode='blobs'):
 
     assert sigma >= 0.0, "Sigma should be non negative."
     assert N > 0, "Number of samples should be a positive integer."
@@ -69,13 +74,14 @@ def run_MD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float,
     assert K > 0, "Number of clusters should be a positive integer."
     assert lambd > 0, "Lambda should be positive."
 
-    iters = [0 for i in range(max_iters)]
+    iters = {'loss': [0 for i in range(max_iters)], 'auc': [0 for i in range(max_iters)], 'accuracy': [0 for i in range(max_iters)]}
+
     if seed != None:
         torch.manual_seed(seed)
         np.random.seed(seed)
 
     lr_const = 1
-    kmodes = LaplacianKmodes(N, D, K, lambd, var, cluster_std, cluster_random_state, sigma)
+    kmodes = LaplacianKmodes(N, D, K, lambd, var, cluster_std, cluster_random_state, sigma, mode)
 
     print('MD')
     print('--')
@@ -98,7 +104,10 @@ def run_MD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float,
 
             kmodes.eval(Z_t)
 
-            iters[0] += kmodes.loss / Niid
+            iters['loss'][0] += kmodes.loss / Niid
+            iters['accuracy'][0] += kmodes.accuracy / Niid
+            iters['auc'][0] += kmodes.auc / Niid
+
             for t in range(1, max_iters):
 
                 if decreasing_lr:
@@ -109,15 +118,16 @@ def run_MD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float,
 
                 kmodes.eval(Z_t)
 
-                iters[t] += kmodes.loss / Niid
+                iters['loss'][t] += kmodes.loss / Niid
+                iters['accuracy'][t] += kmodes.accuracy / Niid
+                iters['auc'][t] += kmodes.auc / Niid
 
-            tqdm.set_postfix(Loss=iters[-1])
+            tqdm.set_postfix(Loss=iters['loss'][-1], Accuracy=iters['accuracy'][-1], AUC=iters['auc'][-1])
 
-
-    return iters
+    return iters, kmodes
 
 def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float, cluster_random_state: int,
-        sigma: float, lr: float, eps=1, max_iters=1000, num_particles=5, decreasing_lr=False, seed=None):
+        sigma: float, lr: float, eps=1, max_iters=1000, num_particles=5, decreasing_lr=False, seed=None, mode='blobs'):
 
     assert sigma >= 0.0, "Sigma should be non negative."
     assert N > 0, "Number of samples should be a positive integer."
@@ -125,13 +135,14 @@ def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float
     assert K > 0, "Number of clusters should be a positive integer."
     assert lambd > 0, "Lambda should be positive."
 
-    iters = [0 for i in range(max_iters)]
+    iters = {'loss': [0 for i in range(max_iters)], 'auc': [0 for i in range(max_iters)], 'accuracy': [0 for i in range(max_iters)]}
+
     if seed != None:
         torch.manual_seed(seed)
         np.random.seed(seed)
 
     lr_const = 1
-    kmodes = LaplacianKmodes(N, D, K, lambd, var, cluster_std, cluster_random_state, sigma)
+    kmodes = LaplacianKmodes(N, D, K, lambd, var, cluster_std, cluster_random_state, sigma, mode)
 
     print()
     print('InterMD')
@@ -157,7 +168,11 @@ def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float
                 tqdm.set_description('IMD')
 
             obj_min = float('Inf')
+            acc_max = 0.0
             obj_avg = 0.0
+            acc_avg = 0.0
+            auc_avg = 0.0
+
             # A = particles
 
             for p in range(num_particles):
@@ -165,8 +180,11 @@ def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float
 
                 kmodes.eval(Z_p)
                 obj_avg += kmodes.loss / num_particles
+                acc_avg += kmodes.accuracy / num_particles
+                auc_avg += kmodes.auc / num_particles
 
                 obj_min = kmodes.loss if obj_min > kmodes.loss else obj_min
+                acc_max = kmodes.accuracy if acc_max < kmodes.accuracy else acc_max
 
                 Z_p = torch.prod(torch.pow(particles, interaction_mat[p]), axis=2)
 
@@ -179,45 +197,56 @@ def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float
 
                 particles[:, :, p] = Z_p
 
-            iters[t] = obj_avg
+            iters['loss'][t] = obj_avg
+            iters['accuracy'][t] = acc_avg
+            iters['auc'][t] = auc_avg
+            tqdm.set_postfix(Loss=iters['loss'][t], Accuracy=iters['accuracy'][t], AUC=iters['auc'][t])
 
-            tqdm.set_postfix(Loss=iters[t])
-
-    return iters
+    return iters, kmodes
 
 if __name__ == "__main__":
     eps = 1
-    max_iters = 2000
-    N = 1000
-    D = 3
-    K = 10
-    lambd = 1
-    var = 1
-    cluster_std = 1.5
+    max_iters = 10
+    N = 100
+    D = 2
+    K = 3
+    lambd = 10
+    var = 5
+    cluster_std = 0.5
     cluster_random_state = 0
     sigma = 0
     seed = 0
     lr_gd = 0.0005
-    lr_md = 0.005
-    lr_imd = 0.005
+    lr_md = 0.0001
+    lr_imd = 0.00005
     decreasing_lr = True
     Niid = 5
     num_particles = 5
+    mode = 'blobs'
 
     args_gd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
-        'sigma': sigma, 'lr': lr_gd, 'eps': eps, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed}
+        'sigma': sigma, 'lr': lr_gd, 'eps': eps, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
     args_md = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
-        'sigma': sigma, 'lr': lr_md,'eps': eps, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed}
+        'sigma': sigma, 'lr': lr_md,'eps': eps, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
     args_imd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
-        'sigma': sigma, 'lr': lr_imd, 'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
+        'sigma': sigma, 'lr': lr_imd, 'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
 
-    path = './saved_items/Nsamp_{}/'.format(N)
+    path = './saved_items/N_{}_D_{}_K_{}_lambda_{}_var_{}_clusterstd_{}/'.format(N, D, K, lambd, var, cluster_std)
+
     if not os.path.exists(path):
         os.mkdir(path)
-    #
-    losses_gd = run_GD(**args_gd)
-    save_obj((losses_gd, args_gd), path + str(args_gd))
-    losses_md = run_MD(**args_md)
-    save_obj((losses_md, args_md), path + str(args_md))
-    losses_imd = run_IMD(**args_imd)
-    save_obj((losses_imd, args_imd), path + str(args_imd))
+
+    path_gd = path + 'GD_Niid_{}_lr_{}_iters_{}'.format(Niid, lr_gd, max_iters)
+    losses_gd, kmodes_gd = run_GD(**args_gd)
+    torch.save(kmodes_gd, path_gd + '_model.pt' )
+    save_obj((losses_gd, args_gd), path_gd)
+
+    path_md = path + 'MD_Niid_{}_lr_{}_iters_{}'.format(Niid, lr_md, max_iters)
+    losses_md, kmodes_md = run_MD(**args_md)
+    torch.save(kmodes_md, path_md + '_model.pt')
+    save_obj((losses_md, args_md), path_md)
+
+    path_imd = path + 'IMD_Np_{}_lr_{}_iters_{}'.format(num_particles, lr_md, max_iters)
+    losses_imd, kmodes_imd = run_IMD(**args_imd)
+    torch.save(kmodes_imd, path_imd + '_model.pt')
+    save_obj((losses_imd, args_imd), path_imd)
