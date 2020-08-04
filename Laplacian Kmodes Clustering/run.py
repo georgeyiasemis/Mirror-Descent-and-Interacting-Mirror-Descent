@@ -6,13 +6,13 @@ import matplotlib.pyplot as plt
 if __name__ == "__main__":
 
     eps = 1
-    max_iters = 500
-    N = 1000
-    D = 2
-    K = 2
-    lambd = 2
-    var = 0.65
-    cluster_std = 0.15
+    max_iters = 50
+    N = 2000
+    D = 3
+    K = 10
+    lambd = 100
+    var = 10
+    cluster_std = 0.7
     cluster_random_state = 0
     sigma = 0
     seed = 1
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     decreasing_lr = True
     Niid = 2
     num_particles = 2
-    mode = 'moons'
+    mode = 'blobs'
     args_gd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
         'sigma': sigma, 'lr': lr_gd, 'eps': eps, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
     args_md = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,

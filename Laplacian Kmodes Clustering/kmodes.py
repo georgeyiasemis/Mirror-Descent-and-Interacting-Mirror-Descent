@@ -58,7 +58,12 @@ class LaplacianKmodes():
 
         y = torch.tensor(y).int()
 
-        centers = np.random.uniform(low=(X[:, 0].min(), X[:, 1].min()), high=(X[:, 0].max(), X[:, 1].max()), size=(2,2))
+        # centers = np.random.uniform(low=(X[:, 0].min(), X[:, 1].min()), high=(X[:, 0].max(), X[:, 1].max()), size=(2,2))
+
+        ms = MeanShift(bandwidth=self.bandwidth, bin_seeding=True)
+        ms.fit(X.numpy())
+        cluster_centers = ms.cluster_centers_
+        centers = torch.tensor(cluster_centers)
         centers = torch.tensor(centers).float()
         return X, y, centers
 
@@ -83,16 +88,9 @@ class LaplacianKmodes():
         assert len(Z.shape) == 2
         self.Z = Z
         # Run otpimisation for C for fixed Z with GD
-        # for t in range(C_iters):
-        #     C = self.C.clone()
-        #     # print(self.grad_C( Z, C))
-        #     self.C = C - eta_c  * self.eval_grad_C(Z, C)
-        # bandwidth = estimate_bandwidth(self.X, quantile=0.2, n_samples=500)
-        ms = MeanShift(bandwidth=self.bandwidth, bin_seeding=True)
-        ms.fit(self.X.numpy())
-        # labels = ms.labels_
-        cluster_centers = ms.cluster_centers_
-        self.C = torch.tensor(cluster_centers)
+        for t in range(C_iters):
+            C = self.C.clone()
+            self.C = C - eta_c  * self.eval_grad_C(Z, C)
 
 
         B = torch.zeros((self.N, self.K))

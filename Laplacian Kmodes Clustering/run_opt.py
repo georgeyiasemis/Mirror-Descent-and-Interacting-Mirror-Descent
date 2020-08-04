@@ -143,7 +143,6 @@ def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float
 
     lr_const = 1
     kmodes = LaplacianKmodes(N, D, K, lambd, var, cluster_std, cluster_random_state, sigma, mode)
-    kmodes.plot_2d_clusters(C=kmodes.C0)
 
     print()
     print('InterMD')
