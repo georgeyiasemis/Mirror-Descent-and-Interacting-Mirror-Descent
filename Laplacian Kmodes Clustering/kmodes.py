@@ -6,6 +6,9 @@ from scipy.stats import norm as normal
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_auc_score
+from sklearn.neighbors import kneighbors_graph
+from sklearn.cluster import MeanShift, estimate_bandwidth
+
 
 def one_hot(a, num_classes):
 
@@ -13,13 +16,13 @@ def one_hot(a, num_classes):
 
 class LaplacianKmodes():
 
-    def __init__(self, N, D, K, lambd, var, cluster_std, random_state=1, sigma=0, mode='blobs'):
+    def __init__(self, N, D, K, lambd, bandwidth, cluster_std, random_state=1, sigma=0, mode='blobs'):
         assert N >= D
         self.N = N
         self.D = D
         self.K = K
         self.lambd = lambd
-        self.var = var
+        self.bandwidth = bandwidth
         self.sigma = sigma
         self.stochastic = True if sigma > 0 else False
         if mode == 'blobs':
@@ -29,7 +32,7 @@ class LaplacianKmodes():
             self.D = 2
             self.X, self.labels, self.C = self.generate_moons(cluster_std, random_state)
 
-        self.C = self.C.clone()
+        self.C0 = self.C.clone()
         torch.manual_seed(random_state)
         np.random.seed(random_state)
         self.W = self.generate_affinity_matrix()
@@ -59,32 +62,44 @@ class LaplacianKmodes():
         centers = torch.tensor(centers).float()
         return X, y, centers
 
-    def generate_affinity_matrix(self, exp=True):
+    def generate_affinity_matrix(self, bin=False):
         '''Returns a symmetric binary affinity matrix'''
-        if not exp:
-            W = torch.rand(self.N, self.N).round()
-            W = torch.tril(W) + torch.tril(W,-1).T
-
+        if bin:
+            W = kneighbors_graph(self.X, int(self.N / self.K), mode='connectivity', include_self=True)
+            W = torch.tensor(W.toarray()).float()
         else:
             gamma = 0.5
             X1 = self.X.clone().reshape(self.N, 1, self.D)
             X2 = self.X.clone().reshape(1, self.N, self.D)
-            W = torch.exp(-gamma * torch.sum(torch.pow(X1-X2, 2), axis=-1)).float()
+            dist = torch.sum(torch.pow(X1-X2, 2), axis=-1)
+            W = torch.exp(-gamma * dist).float()
             print(W)
         return W
 
 
-    def eval(self, Z, C_iters=100, eta_c=0.00001):
+    def eval(self, Z, C_iters=10, eta_c=0.005):
 
         assert isinstance(Z, torch.Tensor)
         assert len(Z.shape) == 2
         self.Z = Z
+        # Run otpimisation for C for fixed Z with GD
+        # for t in range(C_iters):
+        #     C = self.C.clone()
+        #     # print(self.grad_C( Z, C))
+        #     self.C = C - eta_c  * self.eval_grad_C(Z, C)
+        # bandwidth = estimate_bandwidth(self.X, quantile=0.2, n_samples=500)
+        ms = MeanShift(bandwidth=self.bandwidth, bin_seeding=True)
+        ms.fit(self.X.numpy())
+        # labels = ms.labels_
+        cluster_centers = ms.cluster_centers_
+        self.C = torch.tensor(cluster_centers)
+
 
         B = torch.zeros((self.N, self.K))
 
         for n in range(self.N):
             B[n] = torch.Tensor(normal.pdf(
-            torch.pow((self.X[n] - self.C)/np.sqrt(self.var), 2).sum(1)))
+            torch.pow((self.X[n] - self.C)/np.sqrt(self.bandwidth), 2).sum(1)))
 
         D = torch.diag(self.W.sum(1))
         # Laplacian
@@ -94,15 +109,21 @@ class LaplacianKmodes():
         self.accuracy = self.eval_accuracy()
         self.auc = self.eval_auc_score()
 
-        # Run otpimisation for C for fixed Z with GD
-        for t in range(C_iters):
-            self.C -= eta_c / np.sqrt(t + 1) * self.opt_C(Z, self.C)
+
 
         if self.stochastic:
             self.loss += self.sigma * torch.randn(1).item()
             self.gradient += self.sigma * torch.randn((self.K))
 
+    def eval_grad_C(self, Z, C):
 
+        grad_C = torch.zeros(C.shape)
+        for k in range(self.K):
+            X = (self.X - C[k]) / self.bandwidth
+            norm = torch.pow(X,2).sum(1)
+            G_norm = normal.pdf(norm)
+            grad_C[k] = (-2 * Z[:,k] * norm * G_norm) @ X / self.bandwidth
+        return grad_C + self.sigma * torch.randn((self.C.shape))
     def eval_accuracy(self):
 
         true = self.labels
@@ -115,7 +136,6 @@ class LaplacianKmodes():
         if self.K > 2:
             y = self.labels.numpy()
             true = one_hot(y, self.K)
-            # print(true)
             true_scores = self.Z.numpy()
         else:
             true = self.labels.numpy()
@@ -123,74 +143,67 @@ class LaplacianKmodes():
 
         return roc_auc_score(true, true_scores)
 
-    def opt_C(self, Z, C):
-
-        grad_C = torch.zeros(C.shape)
-        for k in range(self.K):
-            X = (self.X - C[k]) / np.sqrt(self.var)
-            norm = torch.pow(X,2).sum(1)
-            G_norm = normal.pdf(norm)
-            grad_C[k] = (-2 / self.var * Z[:,k] * norm * G_norm) @ X
-        return grad_C
-
-    def plot_2d_clusters(self, y=None, C=None):
+    def plot_2d_clusters(self, path='', title='', y=None, C=None):
 
         assert self.D == 2
         if y == None:
             y = self.labels
         if C == None:
-            C = self.C
+            C = self.C0
 
         with plt.style.context(('seaborn-colorblind')):
-            # fig = plt.figure(figsize=(20,15))
-            y_unique = np.unique(y)
-            colors = plt.cm.jet(y_unique*100)
-            for this_y in zip(y_unique):
-                this_X = self.X[y  == this_y[0]]
 
-                plt.scatter(this_X[:, 0], this_X[:, 1], alpha=0.4, edgecolor='k', label= str(this_y[0]),
-                        s=100, color=colors[this_y[0]])
+            y_unique = np.unique(y)
+            colors = np.linspace(0,1,self.K)
+            colors = plt.cm.jet(colors)
+            for this_y in y_unique:
+                this_X = self.X[y  == this_y]
+
+                plt.scatter(this_X[:, 0], this_X[:, 1], alpha=0.4, edgecolor='k', label= str(this_y),
+                        s=100, color=colors[this_y])
                 plt.scatter(C[this_y,0], C[this_y,1], s=200, color='k')
             plt.legend()
-            # plt.xlim(self.X[:,0].min(), self.X[:,0].max())
-            # plt.ylim(self.X[:,1].min(), self.X[:,1].max())
+            plt.title(title, fontsize=15)
             plt.tight_layout()
             plt.show()
-            plt.savefig('2Dgraph_N_{}_K_{}.png'.format(self.N, self.K))
+            plt.savefig(path + '2Dgraph_N_{}_K_{}.png'.format(self.N, self.K))
 
-    def plot_3d_clusters(self, y=None, C=None):
+    def plot_3d_clusters(self, path='', y=None, C=None):
 
         assert self.D == 3
         if y == None:
             y = self.labels
         if C == None:
-            C = self.C
+            C = self.true_centers
 
         with plt.style.context(('seaborn-colorblind')):
             fig = plt.figure(figsize=(20,15))
             y_unique = np.unique(y)
             ax = fig.add_subplot(111, projection='3d')
-            colors = np.linspace(1,10,y_unique.shape[0])
-            colors = plt.cm.jet(colors/colors.max())
-            for this_y in zip(y_unique):
-                this_X = self.X[y == this_y[0]]
-                ax.scatter(this_X[:, 0], this_X[:, 1], this_X[:, 2], alpha=0.4, edgecolor='k', label= str(this_y[0]),
-                           s=100, color=colors[this_y[0]])
-                ax.scatter(C[this_y,0], C[this_y,1], C[this_y,2], s=200, color='k')
-            ax.legend()
+            colors = np.linspace(0,1,self.K)
+            colors = plt.cm.jet(colors)
+            for this_y in y_unique:
+                color = colors[this_y]
+                # print(this_y)
+                this_X = self.X[y == this_y]
+                ax.scatter(this_X[:, 0], this_X[:, 1], this_X[:, 2], alpha=0.15, s=200, edgecolor='k', label= str(this_y),
+                            color=color)
+                ax.scatter(C[this_y,0], C[this_y,1], C[this_y,2], s=300, color='k')
+            ax.legend(fontsize=15)
             ax.set_xlim(self.X[:,0].min(), self.X[:,0].max())
             ax.set_ylim(self.X[:,1].min(), self.X[:,1].max())
             ax.set_zlim(self.X[:,2].min(), self.X[:,2].max())
+            plt.title('$N$ = {}, $K$ = {}'.format(self.N, self.K), fontsize=40)
             plt.tight_layout()
             plt.show()
-            plt.savefig('3Dgraph_N_{}_K_{}.png'.format(self.N, self.K))
+            plt.savefig(path + '3Dgraph_N_{}_K_{}.png'.format(self.N, self.K))
 
 if __name__ == '__main__':
     N = 1000
-    D = 2
-    K = 2
+    D = 3
+    K = 5
 
-    C =  LaplacianKmodes(N, D, K, 1, 1, 0.2, mode='moons')
-    C.plot_2d_clusters()
+    C =  LaplacianKmodes(N, D, K, 1, 1, 1, mode='blobs')
+    C.plot_3d_clusters(C=C.C)
     Z =  torch.ones(N,K) /K
     print(C.eval(Z))

@@ -133,7 +133,7 @@ def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float
     assert N > 0, "Number of samples should be a positive integer."
     assert D > 0, "Dimension should be a positive integer."
     assert K > 0, "Number of clusters should be a positive integer."
-    assert lambd > 0, "Lambda should be positive."
+    assert lambd >= 0, "Lambda should be positive."
 
     iters = {'loss': [0 for i in range(max_iters)], 'auc': [0 for i in range(max_iters)], 'accuracy': [0 for i in range(max_iters)]}
 
@@ -143,6 +143,7 @@ def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float
 
     lr_const = 1
     kmodes = LaplacianKmodes(N, D, K, lambd, var, cluster_std, cluster_random_state, sigma, mode)
+    kmodes.plot_2d_clusters(C=kmodes.C0)
 
     print()
     print('InterMD')
@@ -204,49 +205,49 @@ def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float
 
     return iters, kmodes
 
-if __name__ == "__main__":
-    eps = 1
-    max_iters = 10
-    N = 100
-    D = 2
-    K = 3
-    lambd = 10
-    var = 5
-    cluster_std = 0.5
-    cluster_random_state = 0
-    sigma = 0
-    seed = 0
-    lr_gd = 0.0005
-    lr_md = 0.0001
-    lr_imd = 0.00005
-    decreasing_lr = True
-    Niid = 5
-    num_particles = 5
-    mode = 'blobs'
-
-    args_gd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
-        'sigma': sigma, 'lr': lr_gd, 'eps': eps, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
-    args_md = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
-        'sigma': sigma, 'lr': lr_md,'eps': eps, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
-    args_imd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
-        'sigma': sigma, 'lr': lr_imd, 'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
-
-    path = './saved_items/N_{}_D_{}_K_{}_lambda_{}_var_{}_clusterstd_{}/'.format(N, D, K, lambd, var, cluster_std)
-
-    if not os.path.exists(path):
-        os.mkdir(path)
-
-    path_gd = path + 'GD_Niid_{}_lr_{}_iters_{}'.format(Niid, lr_gd, max_iters)
-    losses_gd, kmodes_gd = run_GD(**args_gd)
-    torch.save(kmodes_gd, path_gd + '_model.pt' )
-    save_obj((losses_gd, args_gd), path_gd)
-
-    path_md = path + 'MD_Niid_{}_lr_{}_iters_{}'.format(Niid, lr_md, max_iters)
-    losses_md, kmodes_md = run_MD(**args_md)
-    torch.save(kmodes_md, path_md + '_model.pt')
-    save_obj((losses_md, args_md), path_md)
-
-    path_imd = path + 'IMD_Np_{}_lr_{}_iters_{}'.format(num_particles, lr_md, max_iters)
-    losses_imd, kmodes_imd = run_IMD(**args_imd)
-    torch.save(kmodes_imd, path_imd + '_model.pt')
-    save_obj((losses_imd, args_imd), path_imd)
+# if __name__ == "__main__":
+#     eps = 1
+#     max_iters = 10
+#     N = 100
+#     D = 2
+#     K = 3
+#     lambd = 10
+#     var = 5
+#     cluster_std = 0.5
+#     cluster_random_state = 0
+#     sigma = 0
+#     seed = 0
+#     lr_gd = 0.0005
+#     lr_md = 0.0001
+#     lr_imd = 0.00005
+#     decreasing_lr = True
+#     Niid = 5
+#     num_particles = 5
+#     mode = 'blobs'
+#
+#     args_gd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
+#         'sigma': sigma, 'lr': lr_gd, 'eps': eps, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
+#     args_md = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
+#         'sigma': sigma, 'lr': lr_md,'eps': eps, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
+#     args_imd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
+#         'sigma': sigma, 'lr': lr_imd, 'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
+#
+#     path = './saved_items/N_{}_D_{}_K_{}_lambda_{}_var_{}_clusterstd_{}/'.format(N, D, K, lambd, var, cluster_std)
+#
+#     if not os.path.exists(path):
+#         os.mkdir(path)
+#
+#     path_gd = path + 'GD_Niid_{}_lr_{}_iters_{}'.format(Niid, lr_gd, max_iters)
+#     losses_gd, kmodes_gd = run_GD(**args_gd)
+#     torch.save(kmodes_gd, path_gd + '_model.pt' )
+#     save_obj((losses_gd, args_gd), path_gd)
+#
+#     path_md = path + 'MD_Niid_{}_lr_{}_iters_{}'.format(Niid, lr_md, max_iters)
+#     losses_md, kmodes_md = run_MD(**args_md)
+#     torch.save(kmodes_md, path_md + '_model.pt')
+#     save_obj((losses_md, args_md), path_md)
+#
+#     path_imd = path + 'IMD_Np_{}_lr_{}_iters_{}'.format(num_particles, lr_md, max_iters)
+#     losses_imd, kmodes_imd = run_IMD(**args_imd)
+#     torch.save(kmodes_imd, path_imd + '_model.pt')
+#     save_obj((losses_imd, args_imd), path_imd)

@@ -13,48 +13,69 @@ plt.rcParams['mathtext.fontset'] = 'stix'
 plt.rcParams['font.family'] = 'STIXGeneral'
 
 
-path = "./saved_items/N_100_D_2_K_2_lambda_1_var_5_clusterstd_0.2/"
-
-path_sgd = path + "GD_Niid_5_lr_0.0005_iters_10"
+path = "./saved_items/N_1000_D_2_K_2_lambda_2_var_0.65_clusterstd_0.15_moons/"
+#
+path_sgd = path + "GD_Niid_2_lr_1e-05_iters_500"
 gd_kmodes = torch.load(path_sgd + '_model.pt')
 
-path_smd = path + "MD_Niid_5_lr_0.0001_iters_10"
+path_smd = path + "MD_Niid_2_lr_1e-05_iters_500"
 md_kmodes = torch.load(path_smd + '_model.pt')
 
-path_imd = path + "IMD_Np_5_lr_0.0001_iters_10"
+path_imd = path + "IMD_Np_2_lr_1e-05_iters_500"
 imd_kmodes = torch.load(path_imd + '_model.pt')
 
-sgd_losses, args_gd = load_obj(path_sgd)
 smd_losses, args_md = load_obj(path_smd)
+sgd_losses, args_gd = load_obj(path_sgd)
 imd_losses, args_imd = load_obj(path_imd)
 
 
 
-print((gd_kmodes.Z.argmax(axis=1) == gd_kmodes.labels.squeeze()).sum())
-print((md_kmodes.Z.argmax(axis=1) == md_kmodes.labels.squeeze()).sum())
-print((imd_kmodes.Z.argmax(axis=1) == imd_kmodes.labels.squeeze()).sum())
+print('GD Accuracy: {}. GD AUC: {}.'.format(sgd_losses['accuracy'][-1], sgd_losses['auc'][-1]))
+y = gd_kmodes.Z.argmax(axis=1)
+plt.figure()
+imd_kmodes.plot_2d_clusters(path +'GD', title='GD, Niid = {}'.format(args_gd['Niid']),
+                y=y, C=gd_kmodes.C)
 
+print('MD Accuracy: {}. MD AUC: {}.'.format(smd_losses['accuracy'][-1], smd_losses['auc'][-1]))
+y = md_kmodes.Z.argmax(axis=1)
+plt.figure()
+imd_kmodes.plot_2d_clusters(path +'MD', title='MD, Niid = {}'.format(args_md['Niid']),
+                y=y, C=md_kmodes.C)
+
+print('IMD Accuracy: {}. IMD AUC: {}.'.format(imd_losses['accuracy'][-1], imd_losses['auc'][-1]))
 y = imd_kmodes.Z.argmax(axis=1)
-imd_kmodes.plot_2d_clusters(y, C=imd_kmodes.C)
-#
-#
-# # print(str(args))
-# path = './figures/'
-# if not os.path.exists(path):
-#     os.mkdir(path)
-# #
+plt.figure()
+plt.title('Results for IMD')
+imd_kmodes.plot_2d_clusters(path +'IMD' ,  title='IMD, N_p = {}'.format(args_imd['num_particles']),
+                y=y, C=imd_kmodes.C)
 # plt.figure()
-# plt.plot(np.array(smd_losses['accuracy'])[:],linewidth=1, label='MD')
-# plt.plot(np.array(sgd_losses['accuracy'])[:],linewidth=1, label='GD')
-# plt.plot(np.array(imd_losses['accuracy'])[:],linewidth=1, label='IMD')
-# # # plt.semilogy(np.array(simd_losses50),linewidth=1, label='SIMD. $ Np = $ {:3}, $\sigma =$ {:4}'.format(50, sigma))
-# # # plt.semilogy(np.array(simd_losses100),linewidth=1, label='SIMD. $ Np = $ {:3}, $\sigma =$ {:4}'.format(100, sigma))
-# # plt.ylabel('Function Value')
-# # plt.xlabel('Iterations')
-# # title = 'Loss function for $N$ = {}, $K$ = {}, $D$ = {}'.format(args['N'], args['K'], args['D'])
-# # plt.title(title, fontsize=20)
-# # plt.tight_layout()
-# plt.legend()
-# # plt.show()
-# # plt.ylim(min(smd_losses)-2, 10)
-# plt.savefig(path + 'fig.png', dpi=300)
+# imd_kmodes.plot_2d_clusters(path +'original', title='Two half-moons, N = {}'.format(args_md['N']))
+
+
+
+
+plt.figure()
+plt.plot(np.array(smd_losses['loss'])[:],linewidth=1, label='MD. $Niid$ = {}'.format(args_md['Niid']))
+plt.plot(np.array(sgd_losses['loss'])[:],linewidth=1, label='GD, $Niid$ = {}'.format(args_gd['Niid']))
+plt.plot(np.array(imd_losses['loss'])[:],linewidth=1, label='IMD, $N_p$ = {}'.format(args_imd['num_particles']))
+plt.ylabel('Function Value')
+plt.xlabel('Iterations')
+title = 'Loss function for $N$ = {}, $K$ = {}, $D$ = {}'.format(args_imd['N'], args_imd['K'], args_imd['D'])
+
+plt.title(title, fontsize=15)
+# plt.tight_layout()
+plt.legend()
+plt.show()
+plt.ylim(min(imd_losses['loss'])-0.015, max(imd_losses['loss'])+0.015)
+plt.savefig(path + 'losses.png')
+plt.figure()
+plt.hist(np.array(smd_losses['loss'])[300:],linewidth=1, label='MD. $Niid$ = {}'.format(args_md['Niid']))
+plt.hist(np.array(sgd_losses['loss'])[300:],linewidth=1, label='GD, $Niid$ = {}'.format(args_gd['Niid']))
+plt.hist(np.array(imd_losses['loss'])[300:],linewidth=1, label='IMD, $N_p$ = {}'.format(args_imd['num_particles']))
+plt.xlabel('Function Value')
+title = 'Histogram of loss function for $N$ = {}, $K$ = {}, $D$ = {}'.format(args_imd['N'], args_imd['K'], args_imd['D'])
+plt.title(title, fontsize=15)
+# plt.tight_layout()
+plt.legend()
+plt.show()
+plt.savefig(path + 'hist.png', dpi=300)
