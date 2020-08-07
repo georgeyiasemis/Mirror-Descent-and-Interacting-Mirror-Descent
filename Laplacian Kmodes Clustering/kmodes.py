@@ -31,6 +31,10 @@ class LaplacianKmodes():
             self.K = 2
             self.D = 2
             self.X, self.labels, self.C = self.generate_moons(cluster_std, random_state)
+        elif mode == 'spirals':
+            self.D = 2
+            self.X, self.labels, self.C = self.generate_spirals(cluster_std, random_state)
+
 
         self.C0 = self.C.clone()
         torch.manual_seed(random_state)
@@ -59,12 +63,37 @@ class LaplacianKmodes():
         y = torch.tensor(y).int()
 
         # centers = np.random.uniform(low=(X[:, 0].min(), X[:, 1].min()), high=(X[:, 0].max(), X[:, 1].max()), size=(2,2))
-
         ms = MeanShift(bandwidth=self.bandwidth, bin_seeding=True)
         ms.fit(X.numpy())
         cluster_centers = ms.cluster_centers_
         centers = torch.tensor(cluster_centers)
         centers = torch.tensor(centers).float()
+        return X, y, centers
+
+    def generate_spirals(self, cluster_std, random_state):
+        np.random.seed(random_state)
+        n_samples = int(self.N / self.K)
+        t = np.linspace(0, 20, n_samples)
+
+        X, y = [], []
+        angles = np.linspace(0, 2 * np.pi, self.K + 1)
+        for i in range(len(angles)-1):
+            c = angles[i]
+            x1 = t * np.cos(t+c)
+            x2 = t * np.sin(t+c)
+
+
+            x = np.concatenate((x1.reshape(1,-1), x2.reshape(1,-1)), axis=0)
+            x += cluster_std * np.random.randn(2, n_samples)
+            x = x.T
+            X.append(x)
+            y.append(np.ones(x.shape[0]) * i)
+
+        X = torch.tensor(X).reshape(-1, 2).double()
+        y = torch.tensor(y).reshape(-1).int()
+        centers = np.random.uniform(low=tuple(X.min(axis=0)[0]), high=tuple(X[:].max(axis=0)[0]), size=(self.K, self.D))
+        centers = torch.tensor(centers).float()
+        
         return X, y, centers
 
     def generate_affinity_matrix(self, bin=False):
@@ -73,7 +102,7 @@ class LaplacianKmodes():
             W = kneighbors_graph(self.X, int(self.N / self.K), mode='connectivity', include_self=True)
             W = torch.tensor(W.toarray()).float()
         else:
-            gamma = 0.5
+            gamma = 0.9
             X1 = self.X.clone().reshape(self.N, 1, self.D)
             X2 = self.X.clone().reshape(1, self.N, self.D)
             dist = torch.sum(torch.pow(X1-X2, 2), axis=-1)
@@ -122,6 +151,7 @@ class LaplacianKmodes():
             G_norm = normal.pdf(norm)
             grad_C[k] = (-2 * Z[:,k] * norm * G_norm) @ X / self.bandwidth
         return grad_C + self.sigma * torch.randn((self.C.shape))
+
     def eval_accuracy(self):
 
         true = self.labels
@@ -198,10 +228,10 @@ class LaplacianKmodes():
 
 if __name__ == '__main__':
     N = 1000
-    D = 3
+    D = 2
     K = 5
 
-    C =  LaplacianKmodes(N, D, K, 1, 1, 1, mode='blobs')
-    C.plot_3d_clusters(C=C.C)
+    C =  LaplacianKmodes(N, D, K, 1, 1, 0.1, mode='spirals')
+    C.plot_2d_clusters()
     Z =  torch.ones(N,K) /K
     print(C.eval(Z))
