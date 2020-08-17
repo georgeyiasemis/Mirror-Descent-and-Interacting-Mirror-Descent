@@ -37,9 +37,9 @@ pip install torch torchvision
 Please refer to the website of each package to find explicitly what you need for your system.
 
 
-## Contributing
+<!--## Contributing-->
 
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+<!--Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.-->
 
 ## Authors
 
@@ -61,4 +61,16 @@ The main references of these project are:
 * Anastasia Borovykh, Nikolas Kantas, Panos Parpas, and Grigorios Pavliotis. On
 stochastic mirror descent with interacting particles: convergence properties and
 variance reduction, 07 2020.
+
 * Sébastien Bubeck. Convex optimization: Algorithms and complexity, 2014.
+
+* Weiran Wang and Miguel A. Carreira-Perpiñán. The laplacian k-modes algorithm ´
+for clustering, 2014.
+
+* Sinho Chewi, Thibaut Le Gouic, Chen Lu, Tyler Maunu, Philippe Rigollet, and
+Austin J. Stromme. Exponential ergodicity of mirror-langevin diffusions, 2020.
+
+* Cem Aksoylar, Lorenzo Orecchia, and Venkatesh Saligrama. Connected subgraph
+detection with mirror descent on SDPs. In Doina Precup and Yee Whye Teh,
+editors, Proceedings of the 34th International Conference on Machine Learning,
+volume 70 of Proceedings of Machine Learning Research, pages 51–59, International Convention Centre, Sydney, Australia, 06–11 Aug 2017. PMLR.
