@@ -1,22 +1,29 @@
 <!-- # Mirror Descent Optimisation -->
-This repository hosts the code submitted as part my MSc in Artificial Intelligence
-at Imperial College London Individual Project. All code is written in Python3.
-For all the dependencies refer to the relevant paragraph of the README file.
+This repository hosts the code submitted as part my Individual Project for the 
+MSc in Artificial Intelligence at Imperial College London. All code is written in Python3.
+<!--For all the dependencies refer to the relevant paragraph of the README file.-->
 
 # Mirror Descent and Interacting Mirror Descent for almost dimension-free optimisation on non-Euclidean spaces
 
 An investigation of Mirror Descent and Interacting particle Mirror Descent optimisation on different problems.
 Many fundamental optimisation problems in machine learning and artificial intelligence have at the core of their frameworks the search of an optimal set parameters that lead to the minimisation or maximisation of a differentiable convex or non-convex objective function over either constrained or unconstrained feasible sets. A plethora of these problems utilise iterative methods that compute the gradient of the objective function at each iteration and take a step towards the steepest ascent or descent. A widely used optimisation method is stochastic gradient descent. Stochastic Gradient Descent is typically well-performing for optimising over Euclidean vector spaces. However, Stochastic Gradient Descent  does not always manage to converge to the optimum due to scaling of the dimensionality of the problem on non-Euclidean spaces, or due to noisy computations of the gradient and frequently proves to be expensive if the optimisation is constrained.  In this project we study an other almost dimension-free iterative optimisation algorithm called Mirror Descent and its variant Interacting particles Mirror Descent on six convex frameworks with convex objective functions. Our aim is to observe the performance and  convergence properties  of these methods and also compare them with the standard Stochastic Gradient Descent method. We show that the mirror descent algorithms can outperform Gradient Descent in cases of optimisation over constrained sets with certain geometry, such as the probability simplex. Additionally, we demonstrate the benefits in terms of convergence for allowing particles to interact in the case of Mirror Descent.
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Dependencies
 
-What things you need to install the software and how to install them
+Several Python packages are required to be install in order to run this code on your local machine:
 
 ```
-Give examples
+numpy
+torch
+scipy
+matplotlib
+tqdm
+
+networkx
 ```
 
 ### Installing
