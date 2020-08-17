@@ -9,8 +9,6 @@ sys.path.insert(0, '../')
 
 from startOpt.q_gamma import  paramQ_star
 
-from Time.tictoc import tic, toc
-
 def startOpt_md(A, C, gamma, s, max_iter=100):
 
     n = A.shape[0]
