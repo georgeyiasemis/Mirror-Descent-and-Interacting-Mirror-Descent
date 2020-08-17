@@ -52,9 +52,11 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
+I would like to acknowledge:
+
+* My supervisor Dr Panos Parpas of the Department of Computing at Imperial College London for his counsel and recommendations.
+* My family and friends for the encouragement and support during this difficult and challenging period.
+* All the Academic staff of the Department of Computing at Imperial College for tha amazing knowledge they offered me this year.
 
 ## References
 The main references of these project are:
