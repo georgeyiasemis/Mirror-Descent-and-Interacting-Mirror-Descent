@@ -61,7 +61,4 @@ The main references of these project are:
 * Anastasia Borovykh, Nikolas Kantas, Panos Parpas, and Grigorios Pavliotis. On
 stochastic mirror descent with interacting particles: convergence properties and
 variance reduction, 07 2020.
-
-* Anastasia Borovykh, Nikolas Kantas, Panos Parpas, and Grigorios A. Pavliotis.
-On stochastic mirror descent with interacting particles: convergence properties
-and variance reduction, 2020.
+* Sébastien Bubeck. Convex optimization: Algorithms and complexity, 2014.
