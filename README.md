@@ -55,3 +55,13 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 * Hat tip to anyone whose code was used
 * Inspiration
 * etc
+
+## References
+The main references of these project are:
+* Anastasia Borovykh, Nikolas Kantas, Panos Parpas, and Grigorios Pavliotis. On
+stochastic mirror descent with interacting particles: convergence properties and
+variance reduction, 07 2020.
+
+* Anastasia Borovykh, Nikolas Kantas, Panos Parpas, and Grigorios A. Pavliotis.
+On stochastic mirror descent with interacting particles: convergence properties
+and variance reduction, 2020.
