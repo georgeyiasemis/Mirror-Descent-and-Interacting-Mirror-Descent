@@ -1,5 +1,5 @@
 <!-- # Mirror Descent Optimisation -->
-This repository hosts the code submitted as part my Individual Project for the 
+This repository hosts the code submitted as part my Individual Project for the
 MSc in Artificial Intelligence at Imperial College London. All code is written in Python3.
 <!--For all the dependencies refer to the relevant paragraph of the README file.-->
 
@@ -28,7 +28,7 @@ networkx
 
 ### Installing
 
-Most of the packages can be intalled using ```pip```, ```pip3```, or ```conda``` if you are using Anaconda. 
+Most of the packages can be intalled using ```pip```, ```pip3```, or ```conda``` if you are using Anaconda.
 For example you can run on your bash the following line to install ```pytorch```:
 
 ```
@@ -66,7 +66,7 @@ variance reduction, 07 2020.
 
 * Sébastien Bubeck. Convex optimization: Algorithms and complexity, 2014.
 
-* Weiran Wang and Miguel A. Carreira-Perpiñán. The laplacian k-modes algorithm ´
+* Weiran Wang and Miguel A. Carreira-Perpiñán. The laplacian k-modes algorithm 
 for clustering, 2014.
 
 * Sinho Chewi, Thibaut Le Gouic, Chen Lu, Tyler Maunu, Philippe Rigollet, and
