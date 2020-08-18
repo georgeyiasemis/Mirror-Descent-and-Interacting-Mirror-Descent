@@ -5,6 +5,9 @@ import os
 from kmodes import LaplacianKmodes
 import torch
 
+'''
+Plot saved results.
+'''
 
 
 plt.rcParams['font.size'] = '11'

@@ -17,6 +17,34 @@ def one_hot(a, num_classes):
 class LaplacianKmodes():
 
     def __init__(self, N, D, K, lambd, bandwidth, cluster_std, random_state=1, sigma=0, mode='blobs'):
+        
+        """This class generates samples in random clusters (blobs, moons) and
+            contains methods to solve the optimisation of the paper
+                ''The Laplacian K-modes algorithm for clustering''.
+
+        Parameters
+        ----------
+        N : int
+            Number of samples [x_1,...,x_N].
+        D : int
+            Dimension of samples x_i.
+        K : int
+            Number of clusters.
+        lambd : float
+            lambd >= 0  a tradeoff parameter.
+        bandwitdh : float
+            Variance parameter for kernels.
+        cluster_std : float
+            Standard deviation of the random generated clusters.
+        random_state : int
+            Random state of the random generated clusters.
+        sigma : float
+            Noise parameter. If sigma > 0 then optimisation is Stochastic
+        mode : str
+            One of ['blobs', 'moons'].
+
+
+        """
         assert N >= D
         self.N = N
         self.D = D
@@ -31,9 +59,9 @@ class LaplacianKmodes():
             self.K = 2
             self.D = 2
             self.X, self.labels, self.C = self.generate_moons(cluster_std, random_state)
-        elif mode == 'spirals':
-            self.D = 2
-            self.X, self.labels, self.C = self.generate_spirals(cluster_std, random_state)
+        # elif mode == 'spirals':
+        #     self.D = 2
+        #     self.X, self.labels, self.C = self.generate_spirals(cluster_std, random_state)
 
 
         self.C0 = self.C.clone()
@@ -70,31 +98,6 @@ class LaplacianKmodes():
         centers = torch.tensor(centers).float()
         return X, y, centers
 
-    def generate_spirals(self, cluster_std, random_state):
-        np.random.seed(random_state)
-        n_samples = int(self.N / self.K)
-        t = np.linspace(0, 20, n_samples)
-
-        X, y = [], []
-        angles = np.linspace(0, 2 * np.pi, self.K + 1)
-        for i in range(len(angles)-1):
-            c = angles[i]
-            x1 = t * np.cos(t+c)
-            x2 = t * np.sin(t+c)
-
-
-            x = np.concatenate((x1.reshape(1,-1), x2.reshape(1,-1)), axis=0)
-            x += cluster_std * np.random.randn(2, n_samples)
-            x = x.T
-            X.append(x)
-            y.append(np.ones(x.shape[0]) * i)
-
-        X = torch.tensor(X).reshape(-1, 2).double()
-        y = torch.tensor(y).reshape(-1).int()
-        centers = np.random.uniform(low=tuple(X.min(axis=0)[0]), high=tuple(X[:].max(axis=0)[0]), size=(self.K, self.D))
-        centers = torch.tensor(centers).float()
-        
-        return X, y, centers
 
     def generate_affinity_matrix(self, bin=False):
         '''Returns a symmetric binary affinity matrix'''
@@ -107,7 +110,6 @@ class LaplacianKmodes():
             X2 = self.X.clone().reshape(1, self.N, self.D)
             dist = torch.sum(torch.pow(X1-X2, 2), axis=-1)
             W = torch.exp(-gamma * dist).float()
-            print(W)
         return W
 
 
@@ -212,7 +214,6 @@ class LaplacianKmodes():
             colors = plt.cm.jet(colors)
             for this_y in y_unique:
                 color = colors[this_y]
-                # print(this_y)
                 this_X = self.X[y == this_y]
                 ax.scatter(this_X[:, 0], this_X[:, 1], this_X[:, 2], alpha=0.15, s=200, edgecolor='k', label= str(this_y),
                             color=color)
@@ -226,6 +227,31 @@ class LaplacianKmodes():
             plt.show()
             plt.savefig(path + '3Dgraph_N_{}_K_{}.png'.format(self.N, self.K))
 
+    # def generate_spirals(self, cluster_std, random_state):
+    #     np.random.seed(random_state)
+    #     n_samples = int(self.N / self.K)
+    #     t = np.linspace(0, 20, n_samples)
+    #
+    #     X, y = [], []
+    #     angles = np.linspace(0, 2 * np.pi, self.K + 1)
+    #     for i in range(len(angles)-1):
+    #         c = angles[i]
+    #         x1 = t * np.cos(t+c)
+    #         x2 = t * np.sin(t+c)
+    #
+    #
+    #         x = np.concatenate((x1.reshape(1,-1), x2.reshape(1,-1)), axis=0)
+    #         x += cluster_std * np.random.randn(2, n_samples)
+    #         x = x.T
+    #         X.append(x)
+    #         y.append(np.ones(x.shape[0]) * i)
+    #
+    #     X = torch.tensor(X).reshape(-1, 2).double()
+    #     y = torch.tensor(y).reshape(-1).int()
+    #     centers = np.random.uniform(low=tuple(X.min(axis=0)[0]), high=tuple(X[:].max(axis=0)[0]), size=(self.K, self.D))
+    #     centers = torch.tensor(centers).float()
+    #
+    #     return X, y, centers
 if __name__ == '__main__':
     N = 1000
     D = 2

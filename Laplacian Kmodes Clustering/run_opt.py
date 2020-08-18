@@ -1,16 +1,64 @@
 import os
 import numpy as np
 import torch
-from projections import projection_simplex
-import random as rand
+from helper_functions.projections import projection_simplex
 from helper_functions.save_load import save_obj
 from kmodes import LaplacianKmodes
-from tqdm import tqdm,  trange
+from tqdm import trange
 
 def run_GD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float, cluster_random_state: int,
-        sigma: float, lr: float, eps=1, max_iters=1000, Niid=10, decreasing_lr=False, seed=None, mode='blobs'):
+        sigma: float, lr: float,  max_iters=1000, Niid=10, decreasing_lr=False, seed=None, mode='blobs'):
+    """Runs Gradient Descent Optimisation for Equation (5.7) of the project:
 
-    assert sigma >= 0.0, "Sigma should be non negative."
+        \ min_{Z,C} \lambda Tr(Z'ZL) - Tr(B'Z)
+            s.t.    Z 1_K = 1_N
+                    zmk >= 0, m=1,..,N  k=1,...,K
+        where L = diag([\sum{n=1}^N W_{mn}]_{m=1}^N) - W and
+            B_{mk} = Normal(||x_m - c_k||_2^2 / var).
+
+        and where W is the affinity matrix of the problem.
+
+    Parameters
+    ----------
+    N : int
+        Number of samples [x_1,...,x_N].
+    D : int
+        Dimension of samples x_i.
+    K : int
+        Number of clusters.
+    lambd : float
+        \lambda >= 0  a tradeoff parameter.
+    var : float
+        Variance parameter for kernels.
+    cluster_std : float
+        Standard deviation of the random generated clusters.
+    cluster_random_state : int
+        Random state of the random generated clusters.
+    sigma : float
+        Noise parameter. If sigma > 0 then optimisation is Stochastic.
+    lr : float
+        Learning Rate.
+    max_iters : type
+        Description of parameter `max_iters`.
+    Niid : type
+        Description of parameter `Niid`.
+    decreasing_lr : type
+        If true the learning rate is decreasing.
+    seed : int
+        Initial random seed.
+    mode : str
+        One of ['blobs', 'moons'].
+
+    Returns
+    -------
+    iters: dict
+        Dictionary containg the losses, auc, and accuracy at each iteration.
+    kmodes: LaplacianKmodes
+        Object of type LaplacianKmodes with optimised parameters.
+
+    """
+
+    assert sigma >= 0.0, "Noise should be non negative."
     assert N > 0, "Number of samples should be a positive integer."
     assert D > 0, "Dimension should be a positive integer."
     assert K > 0, "Number of clusters should be a positive integer."
@@ -25,6 +73,7 @@ def run_GD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float,
     lr_const = 1
     kmodes = LaplacianKmodes(N, D, K, lambd, var, cluster_std, cluster_random_state, sigma, mode)
 
+    print()
     print('GD')
     print('--')
     print('Number of iid runs: ', Niid)
@@ -48,10 +97,9 @@ def run_GD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float,
                 if decreasing_lr:
                     lr_const = 1 / np.sqrt(t).item()
 
-                # x_{t+1} = Z_t - h_t * e * grad_f(Z_t)
-                Z_t = Z_t - lr * lr_const * eps* kmodes.gradient
+                Z_t = Z_t - lr * lr_const * kmodes.gradient
 
-                # x_{t+1} = Π_X(x_{t+1})
+                # GD requires N projections to the simplex
                 for n in range(N):
                     Z_t[n] = projection_simplex(Z_t[n])
 
@@ -66,7 +114,56 @@ def run_GD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float,
     return iters, kmodes
 
 def run_MD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float, cluster_random_state: int,
-        sigma: float, lr: float, eps=1, max_iters=1000, Niid=10, decreasing_lr=False, seed=None, mode='blobs'):
+        sigma: float, lr: float, max_iters=1000, Niid=10, decreasing_lr=False, seed=None, mode='blobs'):
+    """Runs Mirror Descent Optimisation for Equation (5.7) of the project:
+
+        \ min_{Z,C} \lambda Tr(Z'ZL) - Tr(B'Z)
+            s.t.    Z 1_K = 1_N
+                    zmk >= 0, m=1,..,N  k=1,...,K
+        where L = diag([\sum{n=1}^N W_{mn}]_{m=1}^N) - W and
+            B_{mk} = Normal(||x_m - c_k||_2^2 / var).
+
+        and where W is the affinity matrix of the problem.
+
+    Parameters
+    ----------
+    N : int
+        Number of samples [x_1,...,x_N].
+    D : int
+        Dimension of samples x_i.
+    K : int
+        Number of clusters.
+    lambd : float
+        \lambda >= 0  a tradeoff parameter.
+    var : float
+        Variance parameter for kernels.
+    cluster_std : float
+        Standard deviation of the random generated clusters.
+    cluster_random_state : int
+        Random state of the random generated clusters.
+    sigma : float
+        Noise parameter. If sigma > 0 then optimisation is Stochastic.
+    lr : float
+        Learning Rate.
+    max_iters : type
+        Description of parameter `max_iters`.
+    Niid : type
+        Description of parameter `Niid`.
+    decreasing_lr : type
+        If true the learning rate is decreasing.
+    seed : int
+        Initial random seed.
+    mode : str
+        One of ['blobs', 'moons'].
+
+    Returns
+    -------
+    iters: dict
+        Dictionary containg the losses, auc, and accuracy at each iteration.
+    kmodes: LaplacianKmodes
+        Object of type LaplacianKmodes with optimised parameters.
+
+    """
 
     assert sigma >= 0.0, "Sigma should be non negative."
     assert N > 0, "Number of samples should be a positive integer."
@@ -83,6 +180,7 @@ def run_MD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float,
     lr_const = 1
     kmodes = LaplacianKmodes(N, D, K, lambd, var, cluster_std, cluster_random_state, sigma, mode)
 
+    print()
     print('MD')
     print('--')
     print('Number of iid runs: ', Niid)
@@ -112,7 +210,8 @@ def run_MD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float,
 
                 if decreasing_lr:
                     lr_const = 1 / np.sqrt(t).item()
-                Z_t = Z_t * torch.exp(- lr * lr_const * eps * kmodes.gradient)
+
+                Z_t = Z_t * torch.exp(- lr * lr_const  * kmodes.gradient)
 
                 Z_t = Z_t / torch.sum(Z_t,1).reshape(-1,1)
 
@@ -129,6 +228,58 @@ def run_MD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float,
 def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float, cluster_random_state: int,
         sigma: float, lr: float, eps=1, max_iters=1000, num_particles=5, decreasing_lr=False, seed=None, mode='blobs'):
 
+    """Runs Interacting Mirror Descent Optimisation for Equation (5.7) of the project:
+
+        \ min_{Z,C} \lambda Tr(Z'ZL) - Tr(B'Z)
+            s.t.    Z 1_K = 1_N
+                    zmk >= 0, m=1,..,N  k=1,...,K
+        where L = diag([\sum{n=1}^N W_{mn}]_{m=1}^N) - W and
+            B_{mk} = Normal(||x_m - c_k||_2^2 / var).
+
+        and where W is the affinity matrix of the problem.
+
+    Parameters
+    ----------
+    N : int
+        Number of samples [x_1,...,x_N].
+    D : int
+        Dimension of samples x_i.
+    K : int
+        Number of clusters.
+    lambd : float
+        \lambda >= 0  a tradeoff parameter.
+    var : float
+        Variance parameter for kernels.
+    cluster_std : float
+        Standard deviation of the random generated clusters.
+    cluster_random_state : int
+        Random state of the random generated clusters.
+    sigma : float
+        Noise parameter. If sigma > 0 then optimisation is Stochastic.
+    lr : float
+        Learning Rate.
+    eps : float
+        Descritisation parameter.
+    max_iters : type
+        Description of parameter `max_iters`.
+    num_particles : int
+        Number of interacting particles.
+    decreasing_lr : type
+        If true the learning rate is decreasing.
+    seed : int
+        Initial random seed.
+    mode : str
+        One of ['blobs', 'moons'].
+
+    Returns
+    -------
+    iters: dict
+        Dictionary containg the losses, auc, and accuracy at each iteration.
+    kmodes: LaplacianKmodes
+        Object of type LaplacianKmodes with optimised parameters.
+
+    """
+
     assert sigma >= 0.0, "Sigma should be non negative."
     assert N > 0, "Number of samples should be a positive integer."
     assert D > 0, "Dimension should be a positive integer."
@@ -143,7 +294,6 @@ def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float
 
     lr_const = 1
     kmodes = LaplacianKmodes(N, D, K, lambd, var, cluster_std, cluster_random_state, sigma, mode)
-    kmodes.plot_2d_clusters('0000')
     print()
     print('InterMD')
     print('-------')
@@ -204,32 +354,32 @@ def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float
 
     return iters, kmodes
 
-# if __name__ == "__main__":
-#     eps = 1
-#     max_iters = 10
-#     N = 100
-#     D = 2
-#     K = 3
-#     lambd = 10
-#     var = 5
-#     cluster_std = 0.5
-#     cluster_random_state = 0
-#     sigma = 0
-#     seed = 0
-#     lr_gd = 0.0005
-#     lr_md = 0.0001
-#     lr_imd = 0.00005
-#     decreasing_lr = True
-#     Niid = 5
-#     num_particles = 5
-#     mode = 'blobs'
-#
-#     args_gd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
-#         'sigma': sigma, 'lr': lr_gd, 'eps': eps, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
-#     args_md = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
-#         'sigma': sigma, 'lr': lr_md,'eps': eps, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
-#     args_imd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
-#         'sigma': sigma, 'lr': lr_imd, 'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
+if __name__ == "__main__":
+    eps = 1
+    max_iters = 10
+    N = 100
+    D = 2
+    K = 3
+    lambd = 10
+    var = 5
+    cluster_std = 0.5
+    cluster_random_state = 0
+    sigma = 0
+    seed = 0
+    lr_gd = 0.0005
+    lr_md = 0.0001
+    lr_imd = 0.00005
+    decreasing_lr = True
+    Niid = 5
+    num_particles = 5
+    mode = 'blobs'
+
+    args_gd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
+        'sigma': sigma, 'lr': lr_gd, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
+    args_md = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
+        'sigma': sigma, 'lr': lr_md, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
+    args_imd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
+        'sigma': sigma, 'lr': lr_imd, 'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
 #
 #     path = './saved_items/N_{}_D_{}_K_{}_lambda_{}_var_{}_clusterstd_{}/'.format(N, D, K, lambd, var, cluster_std)
 #
@@ -237,16 +387,16 @@ def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float
 #         os.mkdir(path)
 #
 #     path_gd = path + 'GD_Niid_{}_lr_{}_iters_{}'.format(Niid, lr_gd, max_iters)
-#     losses_gd, kmodes_gd = run_GD(**args_gd)
+    losses_gd, kmodes_gd = run_GD(**args_gd)
 #     torch.save(kmodes_gd, path_gd + '_model.pt' )
 #     save_obj((losses_gd, args_gd), path_gd)
 #
 #     path_md = path + 'MD_Niid_{}_lr_{}_iters_{}'.format(Niid, lr_md, max_iters)
-#     losses_md, kmodes_md = run_MD(**args_md)
+    losses_md, kmodes_md = run_MD(**args_md)
 #     torch.save(kmodes_md, path_md + '_model.pt')
 #     save_obj((losses_md, args_md), path_md)
 #
 #     path_imd = path + 'IMD_Np_{}_lr_{}_iters_{}'.format(num_particles, lr_md, max_iters)
-#     losses_imd, kmodes_imd = run_IMD(**args_imd)
+    losses_imd, kmodes_imd = run_IMD(**args_imd)
 #     torch.save(kmodes_imd, path_imd + '_model.pt')
 #     save_obj((losses_imd, args_imd), path_imd)

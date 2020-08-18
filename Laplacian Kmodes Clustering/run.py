@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from run_opt import *
 import matplotlib.pyplot as plt
+
 if __name__ == "__main__":
 
     eps = 1
@@ -24,9 +25,9 @@ if __name__ == "__main__":
     num_particles = 2
     mode = 'blobs'
     args_gd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
-        'sigma': sigma, 'lr': lr_gd, 'eps': eps, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
+        'sigma': sigma, 'lr': lr_gd,  'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
     args_md = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
-        'sigma': sigma, 'lr': lr_md,'eps': eps, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
+        'sigma': sigma, 'lr': lr_md,  'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
     args_imd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
         'sigma': sigma, 'lr': lr_imd, 'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
 
@@ -38,9 +39,6 @@ if __name__ == "__main__":
 
     path_imd = path + 'IMD_Np_{}_lr_{}_iters_{}'.format(num_particles, lr_md, max_iters)
     losses_imd, kmodes_imd = run_IMD(**args_imd)
-    # y = kmodes_imd.Z.argmax(axis=1)
-    # plt.figure()
-    # kmodes_imd.plot_3d_clusters('1111',y=y, C=kmodes_imd.C)
     torch.save(kmodes_imd, path_imd + '_model.pt')
     save_obj((losses_imd, args_imd), path_imd)
 
