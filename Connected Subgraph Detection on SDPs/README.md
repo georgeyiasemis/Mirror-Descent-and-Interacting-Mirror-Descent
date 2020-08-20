@@ -5,7 +5,7 @@ The functions needed to perform the Mirror Descent and Interacting Mirror Descen
 
 * Folder ``aistats`` contains code for **Disease Outbreak Anomaly Detection** on a real world graph (Section 5.5.2). 
 
-* Folder ``geo-code`` contains code for ** Random Geometric Graphs Anomalous Clusters Classification** (Section 5.5.3). 
+* Folder ``geo-code`` contains code for ** Random Geometric Graphs Anomalous Clusters Classification ** (Section 5.5.3). 
 
 ## References
 
