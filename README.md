@@ -41,6 +41,19 @@ Please refer to the website of each package to find explicitly what you need for
 
 <!--Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.-->
 
+### Run Optimisation
+
+The main functions are in the following files which they contain the optimisation algorithms for each problem
+
+```
+/Traffic Assignment/run_opt.py
+/Linear System/run_opt.py
+/Mini-batch Optimisation/run_opt.py
+/Laplacian Kmodes Clustering/run_opt.py
+/Connected Subgraph Detection on SDPs/startOpt/startOpt.py
+/Langevin Diffuisions/run_opt.py.
+```
+
 ## Authors
 
 * **George Yiasemis** - *Initial work*
