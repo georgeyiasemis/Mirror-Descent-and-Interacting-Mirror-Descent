@@ -43,16 +43,16 @@ Please refer to the website of each package to find explicitly what you need for
 
 ### Run Optimisation
 
-The main functions are in the following files which they contain the optimisation algorithms for each problem
+The main functions are in the following files which they contain the optimisation algorithms for each problem:
 
-```
+``
 /Traffic Assignment/run_opt.py
 /Linear System/run_opt.py
 /Mini-batch Optimisation/run_opt.py
 /Laplacian Kmodes Clustering/run_opt.py
 /Connected Subgraph Detection on SDPs/startOpt/startOpt.py
 /Langevin Diffuisions/run_opt.py.
-```
+``
 
 ## Authors
 
@@ -61,7 +61,7 @@ The main functions are in the following files which they contain the optimisatio
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
 ## Acknowledgments
 
