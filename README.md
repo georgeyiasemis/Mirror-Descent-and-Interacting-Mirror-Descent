@@ -1,6 +1,6 @@
 <!-- # Mirror Descent Optimisation -->
 This repository hosts the code submitted as part my Individual Project for the
-MSc in Artificial Intelligence at Imperial College London. All code is written in Python3.
+**MSc in Artificial Intelligence**(MSc AI) at **Imperial College London**. All code is written in Python3.
 <!--For all the dependencies refer to the relevant paragraph of the README file.-->
 
 # Mirror Descent and Interacting Mirror Descent for almost dimension-free optimisation on non-Euclidean spaces
@@ -45,13 +45,13 @@ Please refer to the website of each package to find explicitly what you need for
 
 The main functions are in the following files which they contain the optimisation algorithms for each problem:
 
-``/Traffic Assignment/run_opt.py``
+``/The Traffic Assignment Problem/run_opt.py``
 
 ``/Linear System/run_opt.py``
 
-``/Mini-batch Optimisation/run_opt.py``
+``/Mini-Batch Optimisation/run_opt.py``
 
-``/Laplacian Kmodes Clustering/run_opt.py``
+``/Laplacian Kmodes for Clustering/run_opt.py``
 
 ``/Connected Subgraph Detection on SDPs/startOpt/startOpt.py``
 
