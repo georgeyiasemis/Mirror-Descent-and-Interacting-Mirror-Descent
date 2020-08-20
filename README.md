@@ -46,10 +46,15 @@ Please refer to the website of each package to find explicitly what you need for
 The main functions are in the following files which they contain the optimisation algorithms for each problem:
 
 ``/Traffic Assignment/run_opt.py``
+
 ``/Linear System/run_opt.py``
+
 ``/Mini-batch Optimisation/run_opt.py``
+
 ``/Laplacian Kmodes Clustering/run_opt.py``
+
 ``/Connected Subgraph Detection on SDPs/startOpt/startOpt.py``
+
 ``/Langevin Diffuisions/run_opt.py``
 
 ## Authors
