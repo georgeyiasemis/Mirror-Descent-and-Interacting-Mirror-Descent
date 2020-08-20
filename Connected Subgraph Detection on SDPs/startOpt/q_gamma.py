@@ -3,6 +3,27 @@ import numpy as np
 # from geo_code.helper_functions.ind2sub import ind2sub
 
 def Q_gamma_M(Adj, u, gamma, r):
+    """Computes
+        Q_{\gamma}(M) = sum_{ij in E} M_ij L_ij - \gamma sum_{i in V} M_ii L_ri
+    where M \ approx u*u' with n x 1 vector u
+
+    Parameters
+    ----------
+    Adj : np.array
+        Adjacency matrix of graph of shape (n, n).
+    u : np.array
+        Vector of shape (n,1).
+    gamma : float
+        Gamma parameter.
+    r : int
+        Root vertex.
+
+    Returns
+    -------
+    Q
+        Description of returned object.
+
+    """
 
     n = Adj.shape[0]
     degs = np.array(Adj.sum(0)).reshape(-1,1)
@@ -38,7 +59,7 @@ def paramQ_star(Adj, degs, gamma, r, X=None, Y=None):
         dummy = np.diag(degs * (Y[r,r] + np.diag(Y) - Y[r,:].T - Y[:,r]))
 
         out = YY - gamma * dummy
-        
+
         return out
 
     elif type(X) == np.ndarray:

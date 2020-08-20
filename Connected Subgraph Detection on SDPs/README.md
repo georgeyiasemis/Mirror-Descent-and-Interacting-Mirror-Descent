@@ -1,11 +1,11 @@
 # Connected Subgraph Detection on SDPs
-This folder contains the code for the optimsation of the problem described in Section 5.5 in the project.
+This folder contains the code for the optimisation of the problem described in Section 5.5 in the project.
 
 The functions needed to perform the Mirror Descent and Interacting Mirror Descent optimisation are hosted in ``\startOpt\startOpt.py``. We solve two problems:
 
-* Folder ``aistats`` contains code for **Disease Outbreak Anomaly Detection** on a real world graph (Section 5.5.2). 
+* Folder ``aistats`` contains code for **Disease Outbreak Anomaly Detection** on a real world graph (Section 5.5.2).
 
-* Folder ``geo-code`` contains code for **Random Geometric Graphs Anomalous Clusters Classification** (Section 5.5.3). 
+* Folder ``geo-code`` contains code for **Random Geometric Graphs Anomalous Clusters Classification** (Section 5.5.3).
 
 ## References
 
