@@ -5,7 +5,7 @@ from tqdm import tqdm,  trange
 
 def run_NLA(d: int, epsilon: float, max_iters: int, Niid: int):
     """
-    Solves NLA (Newton-Langevin Algorithm) from Equation (---) of the project
+    Solves NLA (Newton-Langevin Algorithm) from Equation (5.14) of the project
 
         \ nabla V(X_{k+1}) = (1-epsilon)* \ nabla V(X_{k})
                 + sqrt(2*epsilon) * [\ nabla^2 V(X_{k+1})]^(1/2) * \ xi_k
@@ -21,7 +21,7 @@ def run_NLA(d: int, epsilon: float, max_iters: int, Niid: int):
     d : int
         Dimension of disired sampling space.
     epsilon : float
-        Learning Rate.
+        Step size.
     max_iters : int
         Maximum Iterations to run optimisation.
     Niid : int
@@ -68,7 +68,7 @@ def run_NLA(d: int, epsilon: float, max_iters: int, Niid: int):
 
 def run_INLA(d: int, epsilon: float, max_iters: int, num_particles: int):
     """
-    Solves INLA (Interacting Newton-Langevin Algorithm) from Equation (---) of the project
+    Solves INLA (Interacting Newton-Langevin Algorithm) from Equation (5.17) of the project
 
         \ nabla V(X_{k+1}^i) = (1 - 2*epsilon)* \ nabla V(X_{k}^i)
                 + epsilon \ sum_{j=1}^Np A_{ij}  \ nabla V(X_{k}^j)
@@ -86,7 +86,7 @@ def run_INLA(d: int, epsilon: float, max_iters: int, num_particles: int):
     d : int
         Dimension of disired sampling space.
     epsilon : float
-        Learning Rate.
+        Step size.
     max_iters : int
         Maximum Iterations to run optimisation.
     num_particles : int

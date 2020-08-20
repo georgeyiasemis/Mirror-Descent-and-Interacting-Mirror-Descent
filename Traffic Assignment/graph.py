@@ -7,6 +7,17 @@ from helper_functions.save_load import load_obj, save_obj
 class Graph():
 
     def __init__(self, graph_filename: str, sigma=0):
+        """Contains main methods for solving the Traffic Assignment Problem
+            (Equation (5.1) of the project)
+            
+        Parameters
+        ----------
+        graph_filename : str
+            Path for Graph object.
+        sigma : float
+            Noise parameter. If sigma > 0 then optimisation is Stochastic.
+
+        """
 
         self.graph = load_obj(graph_filename)
         self.paths = load_obj(graph_filename + '_paths')
@@ -29,7 +40,7 @@ class Graph():
 
 
     def eval(self, x):
-        """Evaluates f(x) and grad_f(x).
+        """Evaluates f(x) (Equation 5.1) and grad_f(x) (Equation 5.2).
 
             f(x) = sum_{e\in E} l_e * c_e(l_e,w_e)
                     where c_e(l_e, w_e) = w_e * (1 + l_e) ^ 2 / 2

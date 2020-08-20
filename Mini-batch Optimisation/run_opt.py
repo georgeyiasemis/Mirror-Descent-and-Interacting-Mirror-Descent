@@ -1,9 +1,8 @@
 import numpy as np
 import torch
 from math import ceil
-from projections import projection_simplex
 import random as rand
-from helper_functions.progress import progress
+from helper_functions.projections import projection_simplex
 from helper_functions.save_load import save_obj
 from linear import LinearSystem
 import os
@@ -11,7 +10,44 @@ from tqdm import tqdm,  trange
 
 
 def run_GD(M: int, d: int, batch_size: int, condition: float, sigma: float, lr: float,
-            eps=1, max_iters=1000, Niid=10, decreasing_lr=False, seed=None):
+             max_iters=1000, Niid=10, decreasing_lr=False, seed=None):
+    """Runs Gradient Descent Optimisation for Equation (5.4) of the project:
+
+        \min_{x \in Simplex} 1 / M \sum_{m=1}^M f_m(x)
+
+            where f_m(x) = ||W_m @ x - b_m||_2^2,
+                W_m \in \R^{d * d}, b_m \in \R^d.
+
+    Parameters
+    ----------
+    M : int
+        Total number of observations.
+    d : int
+        Dimension of the problem.
+    batch_size : int
+        Batch Size.
+    condition : float
+        Condition number of W.
+    sigma : float
+        Noise parameter. If sigma > 0 then optimisation is Stochastic.
+    lr : float
+        Learning Rate.
+    max_iters : int
+        Number of iterations to run optimisation.
+    Niid : int
+        Number of iid copies.
+    decreasing_lr : type
+        If true the learning rate is decreasing.
+    seed : int
+        Initial random seed.
+
+    Returns
+    -------
+    iters: list
+        List  of length max_iters containing the value of the loss function at
+        each iteration.
+
+    """
 
     assert sigma >= 0.0, "Sigma should be non negative."
     assert (M > 0) and (M >= batch_size)
@@ -49,7 +85,7 @@ def run_GD(M: int, d: int, batch_size: int, condition: float, sigma: float, lr: 
                     lr_const = 1 / np.sqrt(t).item()
 
                 # x_{t+1} = x_t - h_t * e * grad_f(x_t)
-                x_t = x_t.reshape(-1, 1) - lr * lr_const * eps* system.gradient.reshape(-1, 1)
+                x_t = x_t.reshape(-1, 1) - lr * lr_const * system.gradient.reshape(-1, 1)
 
                 # x_{t+1} = Π_X(x_{t+1})
                 x_t = projection_simplex(x_t)
@@ -63,7 +99,45 @@ def run_GD(M: int, d: int, batch_size: int, condition: float, sigma: float, lr: 
     return iters
 
 def run_MD(M: int, d: int, batch_size: int, condition: float, sigma: float, lr: float,
-            eps=1, max_iters=1000, Niid=10, decreasing_lr=False, seed=None):
+            max_iters=1000, Niid=10, decreasing_lr=False, seed=None):
+    """Runs Mirror Descent Optimisation for Equation (5.4) of the project:
+
+        \min_{x \in Simplex} 1 / M \sum_{m=1}^M f_m(x)
+
+            where f_m(x) = ||W_m @ x - b_m||_2^2,
+                W_m \in \R^{d * d}, b_m \in \R^d.
+
+    Parameters
+    ----------
+    M : int
+        Total number of observations.
+    d : int
+        Dimension of the problem.
+    batch_size : int
+        Batch Size.
+    condition : float
+        Condition number of W.
+    sigma : float
+        Noise parameter. If sigma > 0 then optimisation is Stochastic.
+    lr : float
+        Learning Rate.
+    max_iters : int
+        Number of iterations to run optimisation.
+    Niid : int
+        Number of iid copies.
+    decreasing_lr : type
+        If true the learning rate is decreasing.
+    seed : int
+        Initial random seed.
+
+    Returns
+    -------
+    iters: list
+        List  of length max_iters containing the value of the loss function at
+        each iteration.
+
+
+    """
 
     assert sigma >= 0.0, "Sigma should be non negative."
     assert (M > 0) and (M >= batch_size)
@@ -105,7 +179,7 @@ def run_MD(M: int, d: int, batch_size: int, condition: float, sigma: float, lr: 
 
                 if decreasing_lr:
                     lr_const = 1 / np.sqrt(t).item()
-                x_t = x_t.reshape(-1, 1) * torch.exp(- lr * lr_const * eps * system.gradient).reshape(-1, 1)
+                x_t = x_t.reshape(-1, 1) * torch.exp(- lr * lr_const * system.gradient).reshape(-1, 1)
 
                 x_t = x_t / torch.sum(x_t)
 
@@ -120,6 +194,46 @@ def run_MD(M: int, d: int, batch_size: int, condition: float, sigma: float, lr: 
 
 def run_IMD(M: int, d: int, batch_size: int, condition: float, sigma: float, lr: float,
             eps=1, max_iters=1000, num_particles=5, decreasing_lr=False, seed=None):
+    """Runs Interacting Mirror Descent Optimisation for Equation (5.4) of the project:
+
+        \min_{x \in Simplex} 1 / M \sum_{m=1}^M f_m(x)
+
+            where f_m(x) = ||W_m @ x - b_m||_2^2,
+                W_m \in \R^{d * d}, b_m \in \R^d.
+
+    Parameters
+    ----------
+    M : int
+        Total number of observations.
+    d : int
+        Dimension of the problem.
+    batch_size : int
+        Batch Size.
+    condition : float
+        Condition number of W.
+    sigma : float
+        Noise parameter. If sigma > 0 then optimisation is Stochastic.
+    lr : float
+        Learning Rate.
+    eps : float
+        Discretisation parameter.
+    max_iters : int
+        Number of iterations to run optimisation.
+    num_particles : int
+        Number of interacting particles.
+    decreasing_lr : type
+        If true the learning rate is decreasing.
+    seed : int
+        Initial random seed.
+
+    Returns
+    -------
+    iters: list
+        List  of length max_iters containing the value of the loss function at
+        each iteration.
+
+
+    """
 
     assert sigma >= 0.0, "Sigma should be non negative."
     assert (M > 0) and (M >= batch_size)
@@ -202,7 +316,7 @@ if __name__ == "__main__":
     batch_size = 5
 
     args = {'M': M, 'd': d, 'batch_size': batch_size, 'condition': condition, 'sigma': sigma, 'lr': lr,
-        'eps': eps, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed}
+        'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed}
     args_imd = {'M': M, 'd': d, 'batch_size': batch_size, 'condition': condition, 'sigma': sigma, 'lr': lr,
         'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
 
@@ -216,21 +330,22 @@ if __name__ == "__main__":
     path = path + '/Compare_GD_MD_IMD'
     if not os.path.exists(path):
         os.mkdir(path)
-    #
-    # Compare All
-    # #
+
+    # GD / MD
     # losses_gd = run_GD(**args)
     # save_obj((losses_gd, args), path + '/GD_Niid_{}_iters_{}_M_{}_sigma_{}_batch_{}'.format(Niid, max_iters, M, sigma, batch_size))
     # losses_md = run_MD(**args)
     # save_obj((losses_md, args), path + '/MD_Niid_{}_iters_{}_M_{}_sigma_{}_batch_{}'.format(Niid, max_iters, M, sigma, batch_size))
 
+
+    # Variable Np
     for num_particles in [1, 5, 10, 20, 50, 100]:
         args_imd = {'M': M, 'd': d, 'batch_size': batch_size, 'condition': condition, 'sigma': sigma, 'lr': lr,
             'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
 
 
         losses_imd = run_IMD(**args_imd)
-        save_obj((losses_imd, args_imd), path + '/IMD_Np_{}_iters_{}_M_{}_sigma_{}_batch_{}'.format(num_particles, max_iters, M, sigma, batch_size))
+        # save_obj((losses_imd, args_imd), path + '/IMD_Np_{}_iters_{}_M_{}_sigma_{}_batch_{}'.format(num_particles, max_iters, M, sigma, batch_size))
 
 
     # Compare IMD batch vs full-batch

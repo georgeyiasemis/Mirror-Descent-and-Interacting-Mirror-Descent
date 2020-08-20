@@ -5,6 +5,25 @@ import scipy.sparse as sp
 class LinearSystem():
 
     def __init__(self, M, d,  condition=None, sigma=0):
+        """This class contains methods to solve  the linear system mini-batch
+            optimisation problem (Equation 5.4)
+                \min_{x \in Simplex} 1 / M \sum_{m=1}^M f_m(x)
+
+                    where f_m(x) = ||W_m @ x - b_m||_2^2,
+                        W_m \in \R^{d * d}, b_m \in \R^d.
+        Parameters
+        ----------
+        M : int
+            Total number of observations.
+        d : int
+            Dimension of the problem.
+        condition : float
+            Condition number of W.
+        sigma : float
+            Noise parameter. If sigma > 0 then optimisation is Stochastic.
+
+
+        """
         self.M = M
         self.d = d
         self.Ws = []
@@ -62,9 +81,10 @@ class LinearSystem():
         return torch.randn(self.d).float()
 
     def calculate_loss(self, x, W, b):
-        """Calculate loss f(x):
+
+        """Calculates value of the loss function at x:
             f(x) = 1/M sum_{i=1}^M f_i(x) = 1/M sum_{i=1}^M ||Wx_i - b||_2^2
-            where M = batch_size.
+                where M = batch_size.
 
         Parameters
         ----------
@@ -89,7 +109,8 @@ class LinearSystem():
 
 
     def calculate_gradient(self, x, W, b):
-        """Calculate gradient f(x):
+
+        """Calculates gradient f(x):
             \ nabla f(x) = 1 / M  sum_{i=1}^M 2 * W.T * (W * x_i -b).
 
         Parameters

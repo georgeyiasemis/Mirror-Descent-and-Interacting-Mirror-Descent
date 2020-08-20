@@ -4,7 +4,7 @@ sys.path.insert(0, '../')
 import os
 from helper_functions.genCounty import genCounty
 from helper_functions.save_load import save_obj
-from startOpt.startOpt import startOpt_imd, startOpt_md
+from startOpt.startOpt import runOpt_imd, runOpt_md
 from startOpt.computation import computeAUC
 from tqdm import trange
 
@@ -29,7 +29,7 @@ def county_auc_MD(signal, gammas_n, max_iter=100, nSamp=50, Niid=10):
                 for gind in range(gammas_n):
                     tqdm.set_description('MD || Run = {} gamma = {:2f}'.format(niid+1, gammas[gind]))
 
-                    M = startOpt_md(A=A, C=C, gamma=gammas[gind], s=s, max_iter=max_iter)
+                    M = runOpt_md(A=A, C=C, gamma=gammas[gind], s=s, max_iter=max_iter)
 
                     scores[ns, gind] = np.trace(ys.reshape(-1,1) @ ys.reshape(1,-1) @ M)
                     tqdm.set_postfix(Loss='{:8f}'.format(np.trace(C.T @ M)))
@@ -55,7 +55,7 @@ def county_auc_IMD(signal, gammas_n, max_iter=100, nSamp=50, num_particles=5):
 
                 tqdm.set_description('IMD Np={} || gamma = {:2f}'.format(num_particles, gammas[gind]))
 
-                M = startOpt_imd(A, C, gammas[gind], s, max_iter, num_particles=num_particles)
+                M = runOpt_imd(A, C, gammas[gind], s, max_iter, num_particles=num_particles)
 
                 scores_noise[ns, gind] = np.trace(ys.reshape(-1,1) @ ys.reshape(1,-1) @ M)
                 tqdm.set_postfix(Loss='{:8f}'.format(np.trace(C.T @ M)))

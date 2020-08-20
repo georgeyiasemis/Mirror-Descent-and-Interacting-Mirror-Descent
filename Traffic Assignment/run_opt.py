@@ -1,15 +1,37 @@
 import os
 import numpy as np
 import torch
-from projections import projection_simplex
-import random as rand
-from helper_functions.progress import progress
+from helper_functions.projections import projection_simplex
 from helper_functions.save_load import save_obj
 from graph import Graph
-from tqdm import tqdm,  trange
+from tqdm import trange
 
 def run_GD(graph_filename: str, path_filename: str, sigma: float,
             lr: float,  max_iters: int, Niid: int, decreasing_lr=False, seed=None):
+
+    """Runs Gradient Descent Optimisation for the Traffic Assignment Problem
+        (Equation (5.1) of the project)
+
+    Parameters
+    ----------
+    graph_filename : str
+        Path for Graph object.
+    path_filename : str
+        Path for list of all (simple) paths to optimise.
+    sigma : float
+        Noise parameter. If sigma > 0 then optimisation is Stochastic.
+    lr : float
+        Learning Rate.
+    max_iters : int
+        Number of iterations to run optimisation.
+    Niid : int
+        Number of iid copies.
+    decreasing_lr : type
+        If true the learning rate is decreasing.
+    seed : int
+        Initial random seed.
+
+    """
 
     assert sigma >= 0.0, "Sigma should be non negative."
 
@@ -55,6 +77,30 @@ def run_GD(graph_filename: str, path_filename: str, sigma: float,
 
 def run_MD(graph_filename: str, path_filename: str, sigma: float,
             lr: float,  max_iters: int, Niid: int, decreasing_lr=False, seed=None):
+
+    """Runs Mirror Descent Optimisation for the Traffic Assignment Problem
+        (Equation (5.1) of the project)
+
+    Parameters
+    ----------
+    graph_filename : str
+        Path for Graph object.
+    path_filename : str
+        Path for list of all (simple) paths to optimise.
+    sigma : float
+        Noise parameter. If sigma > 0 then optimisation is Stochastic.
+    lr : float
+        Learning Rate.
+    max_iters : int
+        Number of iterations to run optimisation.
+    Niid : int
+        Number of iid copies.
+    decreasing_lr : type
+        If true the learning rate is decreasing.
+    seed : int
+        Initial random seed.
+
+    """
 
     assert sigma >= 0.0, "Sigma should be non negative."
 
@@ -104,6 +150,30 @@ def run_MD(graph_filename: str, path_filename: str, sigma: float,
 
 def run_IMD(graph_filename: str, path_filename: str, sigma: float,
             lr: float,  max_iters: int, num_particles: int, eps=1, decreasing_lr=False, seed=None):
+
+    """Runs Interacting Mirror Descent Optimisation for the Traffic Assignment Problem
+        (Equation (5.1) of the project)
+
+    Parameters
+    ----------
+    graph_filename : str
+        Path for Graph object.
+    path_filename : str
+        Path for list of all (simple) paths to optimise.
+    sigma : float
+        Noise parameter. If sigma > 0 then optimisation is Stochastic.
+    lr : float
+        Learning Rate.
+    max_iters : int
+        Number of iterations to run optimisation.
+    Niid : int
+        Number of iid copies.
+    decreasing_lr : type
+        If true the learning rate is decreasing.
+    seed : int
+        Initial random seed.
+
+    """
 
     assert sigma >= 0.0, "Sigma should be non negative."
     assert num_particles > 1
@@ -201,9 +271,9 @@ if __name__ == "__main__":
     # losses_imd = run_IMD(**args_imd)
     # save_obj((losses_imd, args_imd), path + '/IMD_Np_' + str(num_particles) + '_iters_' + str(max_iters))
     losses_gd = run_GD(**args_gd)
-    save_obj((losses_gd, args_gd), path + '/GD_Niid_' + str(Niid) + '_iters_' + str(max_iters))
+    # save_obj((losses_gd, args_gd), path + '/GD_Niid_' + str(Niid) + '_iters_' + str(max_iters))
     losses_md = run_MD(**args_md)
-    save_obj((losses_md, args_md), path + '/MD_Niid_' + str(Niid) + '_iters_' + str(max_iters))
+    # save_obj((losses_md, args_md), path + '/MD_Niid_' + str(Niid) + '_iters_' + str(max_iters))
 
 
     # losses_imd = run_IMD(**args_imd)

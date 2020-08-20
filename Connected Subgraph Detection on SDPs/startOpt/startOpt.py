@@ -9,7 +9,7 @@ sys.path.insert(0, '../')
 
 from startOpt.q_gamma import  paramQ_star
 
-def startOpt_md(A, C, gamma, s, max_iter=100):
+def runOpt_md(A, C, gamma, s, max_iter=100):
 
     n = A.shape[0]
     degs = A.sum(axis=0).T
@@ -46,7 +46,7 @@ def startOpt_md(A, C, gamma, s, max_iter=100):
 
     return M
 
-def startOpt_imd(A, C, gamma, s, max_iter=50, num_particles=10):
+def runOpt_imd(A, C, gamma, s, max_iter=50, num_particles=10):
     n = A.shape[0]
     degs = A.sum(axis=0).T
 
@@ -100,7 +100,7 @@ def startOpt_imd(A, C, gamma, s, max_iter=50, num_particles=10):
     M = X.mean((2,3))
     return M
 
-def startOpt(A, C, gamma, s, max_iter=100):
+def runOpt(A, C, gamma, s, max_iter=100):
     losses = []
     n = A.shape[0]
     degs = A.sum(axis=0).T
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     gamma=1
     S=3
 
-    M=startOpt(A, C, gamma, S)
+    M=runOpt(A, C, gamma, S)
     print(M.shape)
     print(M)
 
