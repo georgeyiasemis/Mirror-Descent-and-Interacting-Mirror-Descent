@@ -1,18 +1,29 @@
 import sys
 sys.path.insert(0, '../')
-from helper_functions.save_load import save_obj
-
 import networkx as nx
 import random
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import numpy as np
-import torch
-
 
 class Geo_graph_3d():
+    """ Generates a graph in the hypercube [-1,1]^3."""
 
-    def __init__(self, n_nodes, radius, seed=None, pos=None):
+    def __init__(self, n_nodes, radius, seed=None):
+
+        """
+
+        Parameters
+        ----------
+        n_nodes : int
+            Number of nodes.
+        radius : float
+            Distance threshold value.
+        seed : int, optional
+            Random seed.
+
+        """
+
         self.n_nodes = n_nodes
         self.radius = radius
         if seed is not None:
@@ -32,6 +43,15 @@ class Geo_graph_3d():
 
     def get_adj(self):
 
+        """Returns Adjacency matrix of the (undirected) graph.
+
+        Returns
+        -------
+        Adj : array
+            Adjacency matrix of graph.
+
+        """
+
         Adj = np.zeros((self.n_nodes, self.n_nodes))
         for edge in self.graph.edges:
             node1 = edge[0]
@@ -42,9 +62,21 @@ class Geo_graph_3d():
 
     def get_pos(self):
 
+        """
+        Returns a dictionary keyed by node with node positions as values.
+
+        """
+
         return nx.get_node_attributes(self.graph, 'pos')
 
     def get_pos_array(self):
+
+        """
+        Returns an array of shape (n_nodes, 3) containing the coordinated position
+        of each node.
+
+        """
+
         dim = 3
         pos = np.zeros((self.n_nodes, dim))
         for node in self.pos:
@@ -52,6 +84,16 @@ class Geo_graph_3d():
         return pos
 
     def plot_graph_3D(self, angle=0):
+
+        """Plots the graph.
+
+        Parameters
+        ----------
+        angle : float
+            Angle of figure.
+
+        """
+
         # Get node positions
         pos = self.pos
 

@@ -209,7 +209,6 @@ def run_IMD(graph_filename: str, path_filename: str, sigma: float,
                 tqdm.set_description('IMD')
             obj_min = float('inf')
             obj_avg = 0.0
-            A = particles
 
             for p in range(num_particles):
                 x_p = particles[:, p]
@@ -232,7 +231,7 @@ def run_IMD(graph_filename: str, path_filename: str, sigma: float,
 
                 x_p /= torch.sum(x_p)
 
-                A[:, p] = x_p
+                particles[:, p] = x_p
 
             iters[t] = obj_avg
 

@@ -14,7 +14,7 @@ def Q_gamma_M(Adj, u, gamma, r):
     u : np.array
         Vector of shape (n,1).
     gamma : float
-        Gamma parameter.
+        Conductance parameter.
     r : int
         Root vertex.
 
@@ -43,6 +43,31 @@ def Q_gamma_M(Adj, u, gamma, r):
 
 
 def paramQ_star(Adj, degs, gamma, r, X=None, Y=None):
+    """Implements connectivity constraint:
+        Q(M) = sum_{ij in E} M_ij L_ij - gamma sum_{i in V} M_ii L_ri
+
+    Parameters
+    ----------
+    Adj : array
+        Adjacency matrix of graph of shape (n, n).
+    degs : array.
+        Degree matrix of graph of shape (n,).
+    gamma : float
+        Conductance parameter.
+    r : int
+        Root vertex.
+    X : array or None
+        Array equal to u @ u'.
+    Y : array or None
+        Array representing the Lagrange multiplier Y.
+
+    Returns
+    -------
+    -    d/dX trace(Y*Q(X)) when called as paramQ_star(Adj, degs, gamma, Y, r)
+    -    Q(X)               when called as paramQ_star(Adj, degs, gamma, r, X)
+
+    """
+
 
     if type(Y) == np.ndarray:
         n = Y.shape[0]

@@ -15,6 +15,25 @@ def PolygonArea(corners):
 
 
 def computeAUC(scores_noise, scores_signal, gammas):
+    """Computes and plots AUC scores.
+
+    Parameters
+    ----------
+    scores_noise : array
+        Array of shape (n_samp, n_gammas) containing false positives of
+        classifation.
+    scores_noise : array
+        Array of shape (n_samp, n_gammas) containing true positives of
+        classifation.
+    gammas : float or array
+        Conducatance parameters used for optimisation.
+
+    Returns
+    -------
+    aucs : list
+        list of shape (n_gammas) containg the AUC score for each gamma.
+
+    """
 
     gamma_pts = 500
     aucs = np.zeros((gammas.shape[0]))
@@ -56,6 +75,5 @@ def computeAUC(scores_noise, scores_signal, gammas):
     plt.plot(points[hull.vertices][:,0], points[hull.vertices][:,1], 'o')
     for simplex in hull.simplices:
         plt.plot(points[simplex, 0], points[simplex, 1], 'k-')
-    # plt.show()
 
     return aucs

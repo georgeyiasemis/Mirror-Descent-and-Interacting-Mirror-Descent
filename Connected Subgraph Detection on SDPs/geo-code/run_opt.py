@@ -5,6 +5,7 @@ sys.path.insert(0, '../')
 from helper_functions.save_load import save_obj
 from startOpt.computation import computeAUC
 
+
 n_nodes = 1000
 radius = 0.5
 seed = 1
@@ -25,8 +26,11 @@ if opt == 'IMD':
 else:
     path = "../saved_data/geo/{}/N_{}nSamp_{}_Niid_{}_K_{}".format(opt, n_nodes,nSamp, Niid, K)
 
+
 if not os.path.exists(path):
     os.mkdir(path)
+
+    
 aucs = []
 for max_iter in max_iters:
     np.random.seed(0)

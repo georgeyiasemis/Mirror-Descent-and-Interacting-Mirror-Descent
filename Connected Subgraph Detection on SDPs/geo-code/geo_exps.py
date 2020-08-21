@@ -1,27 +1,17 @@
-import numpy as np
 import sys
-import scipy
-import os
 sys.path.insert(0, '../')
+import numpy as np
 from genmeasurements import genMeasurements
-from helper_functions.save_load import save_obj
 from startOpt.startOpt import *
 from tqdm import trange
 from generate_graph import Geo_graph_3d
-from helper_functions.save_load import save_obj
 
-
-# path = "../geo-code/example_10k_3d.graph"
-#
-# A, pts = readGeoGraph(path)
-
-# ------------------------------------------------------------------------------
 
 def geo_exps_IMD(n_nodes, radius, l_0, l_1, K=40, thinRatio=1,
                 gammas=10, max_iter=100, nSamp=50, num_particles=3, seed=0):
 
-    """Generates a random geometric graph and solved the Connected Subgraph Detection
-        problem using Interacting Mirror Descent Optimisation.
+    """Solves the Connected Subgraph Detection problem and calculates AUC using
+        Interacting Mirror Descent Optimisation for a random geometric graph.
 
     Parameters
     ----------
@@ -90,8 +80,9 @@ def geo_exps_IMD(n_nodes, radius, l_0, l_1, K=40, thinRatio=1,
 def geo_exps_MD(n_nodes, radius, l_0, l_1, K=40, thinRatio=1,
                 gammas=10, max_iter=100, nSamp=50, Niid=1, seed=0):
 
-    """Generates a random geometric graph and solved the Connected Subgraph Detection
-        problem using Mirror Descent Optimisation.
+    """Solves the Connected Subgraph Detection problem and calculates AUC using
+        Mirror Descent Optimisation for a random geometric graph.
+
 
     Parameters
     ----------
@@ -162,27 +153,3 @@ def geo_exps_MD(n_nodes, radius, l_0, l_1, K=40, thinRatio=1,
         scores_noise[niid] = scores
 
     return scores_noise.mean(0)
-
-# if __name__ == '__main__':
-    #
-    # n_nodes = 1000
-    # radius = 0.5
-    # seed = 1
-    #
-    # gammas_n = 1
-    # K = 20
-    # max_iter = 10
-    # nSamp = 40
-    # num_particles = 3
-    # Niid = 5
-    # path = "../saved_data/geo/IMD/Nnodes_nSamp_{}_Np_{}_Iters_{}_Ng_{}".format(n_nodes,nSamp, num_particles, max_iter, gammas_n)
-    #
-    # if not os.path.exists(path):
-    #     os.mkdir(path)
-    #
-    # l_0, l_1 = 100, 100
-    # scores_noise = geo_exps_IMD(n_nodes, radius, l_0, l_1, K,1, gammas_n, max_iter, nSamp, num_particles, seed)
-    # save_obj(scores_noise, path + '/scores_noise')
-    # l_0, l_1 = 100, 150
-    # scores_signal = geo_exps_IMD(n_nodes, radius, l_0, l_1, K,1, gammas_n, max_iter, nSamp, num_particles)
-    # save_obj(scores_signal, path + '/scores_signal{}'.format(l_1/l_0))
