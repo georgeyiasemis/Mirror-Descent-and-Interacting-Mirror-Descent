@@ -3,7 +3,7 @@ This folder contains the code for the optimisation of the problem described in S
 
 The functions needed to perform the Mirror Descent and Interacting Mirror Descent optimisation are hosted in ``\startOpt\startOpt.py``. We solve two problems:
 
-* Folder ``aistats`` contains code for **Disease Outbreak Anomaly Detection** on a real world graph (Section 5.5.2).
+* Folder ``aistats-code`` contains code for **Disease Outbreak Anomaly Detection** on a real world graph (Section 5.5.2).
 
 * Folder ``geo-code`` contains code for **Random Geometric Graphs Anomalous Clusters Classification** (Section 5.5.3).
 
