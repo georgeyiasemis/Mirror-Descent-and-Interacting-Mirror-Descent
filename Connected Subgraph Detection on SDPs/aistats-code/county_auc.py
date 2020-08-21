@@ -10,7 +10,29 @@ from tqdm import trange
 
 
 def county_auc_MD(signal, gammas_n, max_iter=100, nSamp=50, Niid=10):
-    gammas = np.logspace(-2,np.log10(5), gammas_n)
+    """Computes AUC scores for different number of samples and gammas
+        using Mirror Descent.
+
+    Parameters
+    ----------
+    signal : int
+        Ratio lambda_1/lambda_0.
+    gammas_n : int
+        Number of gammas to run optimisation.
+    max_iter : int
+        Number of iterations.
+    nSamp : int
+        Number of samples.
+    Niid : int
+        Number of iid runs.
+
+    Returns
+    -------
+    scores_noise : np.array
+        List of shape (nSamp, gammas_n) with AUC scores of optimisation.
+
+    """
+    gammas = np.logspace(-2, np.log10(5), gammas_n)
 
 
     A, s, yy = genCounty(signal, nSamp)
@@ -39,6 +61,28 @@ def county_auc_MD(signal, gammas_n, max_iter=100, nSamp=50, Niid=10):
     return scores_noise.mean(0)
 
 def county_auc_IMD(signal, gammas_n, max_iter=100, nSamp=50, num_particles=5):
+    """Computes AUC scores for different number of samples and gammas
+        using Interacting Mirror Descent.
+
+    Parameters
+    ----------
+    signal : int
+        Ratio lambda_1/lambda_0.
+    gammas_n : int
+        Number of gammas to run optimisation.
+    max_iter : int
+        Number of iterations.
+    nSamp : int
+        Number of samples.
+    num_particles : int
+        Number of interacting particles.
+
+    Returns
+    -------
+    scores_noise : np.array
+        List of shape (nSamp, gammas_n) with AUC scores of optimisation.
+
+    """
     gammas = np.logspace(-2,np.log10(5), gammas_n)
 
     A, s, yy = genCounty(signal, nSamp)

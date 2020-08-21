@@ -5,13 +5,29 @@ import sys
 sys.path.insert(0, '../')
 
 def genMeasurements(pts, K, l_0, l_1, numSamples, thinRatio=1):
-
-    '''
-    Given pts uniform in a [-1,1]^d hypercube, generate an ellipsoid anomaly of ~K
-    points centered at the origin. thinRatio gives the ratio of max semi axis
-    length to min semi axis length. Non-anomalous are Poisson(l_0), anomalous
+    """Given pts uniform in a [-1,1]^d hypercube, generate an ellipsoid anomaly of ~K
+    points centered at the origin. Non-anomalous are Poisson(l_0), anomalous
     are Poisson(l_1) with numSamples IID copies.
-    '''
+
+    Parameters
+    ----------
+    pts : np.array
+        Array of nodes.
+    K : int
+        Anomaly size.
+    l_0 : float
+        Base rate.
+    l_1 : float
+        Anomalous rate.
+    numSamples : int
+        Number of samples.
+    thinRatio : float
+        Ratio of max semi axis length to min semi axis length. Determines
+        if graph is an ellipsoid or a sphere.
+
+
+    """
+
     n, d = pts.shape
 
     numLargerDims = 1;

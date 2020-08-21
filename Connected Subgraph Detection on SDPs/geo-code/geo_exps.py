@@ -20,6 +20,41 @@ from helper_functions.save_load import save_obj
 def geo_exps_IMD(n_nodes, radius, l_0, l_1, K=40, thinRatio=1,
                 gammas=10, max_iter=100, nSamp=50, num_particles=3, seed=0):
 
+    """Generates a random geometric graph and solved the Connected Subgraph Detection
+        problem using Interacting Mirror Descent Optimisation.
+
+    Parameters
+    ----------
+    n_nodes : int
+        Number of nodes for the random graph.
+    radius : float
+        Distance threshold value.
+    l_0 : float
+        Base rate.
+    l_1 : float
+        Anomalous rate.
+    K : int
+        Anomaly size.
+    thinRatio : float
+        Ratio of max semi axis length to min semi axis length. Determines if graph is an ellipsoid or a sphere.
+    gammas : int or np.array
+        Conductance rates.
+    max_iter : int
+        Number of iterations.
+    nSamp : int
+        Number of samples.
+    num_particles : int
+        Number of interacting particles.
+    seed : int
+        Random seed.
+
+    Returns
+    -------
+    scores_noise : np.array
+        List of shape (nSamp, gammas_n) with AUC scores of optimisation.
+
+    """
+
 
     graph = Geo_graph_3d(n_nodes=n_nodes, radius=radius, seed=seed)
 
@@ -54,6 +89,42 @@ def geo_exps_IMD(n_nodes, radius, l_0, l_1, K=40, thinRatio=1,
 
 def geo_exps_MD(n_nodes, radius, l_0, l_1, K=40, thinRatio=1,
                 gammas=10, max_iter=100, nSamp=50, Niid=1, seed=0):
+
+    """Generates a random geometric graph and solved the Connected Subgraph Detection
+        problem using Mirror Descent Optimisation.
+
+    Parameters
+    ----------
+    n_nodes : int
+        Number of nodes for the random graph.
+    radius : float
+        Distance threshold value.
+    l_0 : float
+        Base rate.
+    l_1 : float
+        Anomalous rate.
+    K : int
+        Anomaly size.
+    thinRatio : float
+        Ratio of max semi axis length to min semi axis length. Determines if graph is an ellipsoid or a sphere.
+    gammas : int or np.array
+        Conductance rates.
+    max_iter : int
+        Number of iterations.
+    nSamp : int
+        Number of samples.
+    Niid : int
+        Number of iid runs.
+    seed : int
+        Random seed.
+
+    Returns
+    -------
+    scores_noise : np.array
+        List of shape (nSamp, gammas_n) with AUC scores of optimisation.
+
+    """
+
 
 
     graph = Geo_graph_3d(n_nodes=n_nodes, radius=radius, seed=seed)
