@@ -7,6 +7,8 @@ The functions needed to perform the Mirror Descent and Interacting Mirror Descen
 
 * Folder ``geo-code`` contains code for **Random Geometric Graphs Anomalous Clusters Classification** (Section 5.5.3).
 
+* Folder ``helper_functions`` contains functions that help in solving the optimisation problem.
+
 ## References
 
 * Cem Aksoylar, Lorenzo Orecchia, and Venkatesh Saligrama. *Connected subgraph
