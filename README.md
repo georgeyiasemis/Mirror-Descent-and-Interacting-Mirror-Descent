@@ -14,7 +14,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Dependencies
 
-Several Python packages are required to be install in order to run this code on your local machine:
+Several Python packages are required to be installed in order to run this code on your local machine:
 
 ```
 numpy
