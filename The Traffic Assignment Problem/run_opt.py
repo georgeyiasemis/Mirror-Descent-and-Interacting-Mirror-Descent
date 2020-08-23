@@ -149,7 +149,7 @@ def run_MD(graph_filename: str, path_filename: str, sigma: float,
     return iters
 
 def run_IMD(graph_filename: str, path_filename: str, sigma: float,
-            lr: float,  max_iters: int, num_particles: int, eps=1, decreasing_lr=False, seed=None):
+            lr: float,  max_iters: int, num_particles: int, decreasing_lr=False, seed=None):
 
     """Runs Interacting Mirror Descent Optimisation for the Traffic Assignment Problem
         (Equation (5.1) of the project)
@@ -166,8 +166,8 @@ def run_IMD(graph_filename: str, path_filename: str, sigma: float,
         Learning Rate.
     max_iters : int
         Number of iterations to run optimisation.
-    Niid : int
-        Number of iid copies.
+    num_particles : int
+        Number of interacting particles.
     decreasing_lr : type
         If true the learning rate is decreasing.
     seed : int
@@ -227,7 +227,7 @@ def run_IMD(graph_filename: str, path_filename: str, sigma: float,
                 if decreasing_lr:
                     lr_const = 1 / np.sqrt(t + 1).item()
 
-                x_p = x_p * torch.exp(- lr * lr_const * eps * graph.obj_grad).reshape(-1)
+                x_p = x_p * torch.exp(- lr * lr_const * graph.obj_grad).reshape(-1)
 
                 x_p /= torch.sum(x_p)
 
@@ -252,7 +252,6 @@ if __name__ == "__main__":
     max_iters = 500
     num_particles = 5
     decreasing_lr = False
-    eps = 1
     seed = 0
 
     path = path + 'Results/' + graph_filename[-7:]
@@ -267,7 +266,7 @@ if __name__ == "__main__":
      'lr': lr_md, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
 
 
-    # losses_imd = run_IMD(**args_imd)
+    losses_imd = run_IMD(**args_imd)
     # save_obj((losses_imd, args_imd), path + '/IMD_Np_' + str(num_particles) + '_iters_' + str(max_iters))
     losses_gd = run_GD(**args_gd)
     # save_obj((losses_gd, args_gd), path + '/GD_Niid_' + str(Niid) + '_iters_' + str(max_iters))
@@ -288,7 +287,6 @@ if __name__ == "__main__":
     # max_iters = 500
     # num_particles = 10
     # decreasing_lr = True
-    # eps = 1
     # seed = 0
     #
     # path = path + 'Results/' + graph_filename[-7:]

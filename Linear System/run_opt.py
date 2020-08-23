@@ -181,7 +181,7 @@ def run_MD(m: int, d: int, condition: float, sigma: float, lr: float,
     return iters
 
 def run_IMD(m: int, d: int, condition: float, sigma: float, lr: float,
-            eps=1, max_iters=1000, num_particles=5, decreasing_lr=False, seed=None):
+            max_iters=1000, num_particles=5, decreasing_lr=False, seed=None):
 
     """Runs Interacting Mirror Descent Optimisation for Equation (5.3) of the project:
 
@@ -200,8 +200,6 @@ def run_IMD(m: int, d: int, condition: float, sigma: float, lr: float,
         Noise parameter. If sigma > 0 then optimisation is Stochastic.
     lr : float
         Learning Rate.
-    eps : float
-        Discretisation parameter.
     max_iters : int
         Number of iterations to run optimisation.
     Niid : int
@@ -271,7 +269,7 @@ def run_IMD(m: int, d: int, condition: float, sigma: float, lr: float,
                 if decreasing_lr:
                     lr_const = 1 / np.sqrt(t + 1).item()
 
-                x_p = x_p * torch.exp(- lr * lr_const * eps * system.gradient).reshape(-1)
+                x_p = x_p * torch.exp(- lr * lr_const * system.gradient).reshape(-1)
 
                 x_p /= torch.sum(x_p)
 
@@ -285,7 +283,6 @@ def run_IMD(m: int, d: int, condition: float, sigma: float, lr: float,
 
 if __name__ == "__main__":
     sigma = 0.5
-    eps = 1
     max_iters = 1000
     m = 1000
     d = 1000
@@ -302,7 +299,7 @@ if __name__ == "__main__":
     args_md = {'m': m, 'd': d, 'condition': condition, 'sigma': sigma, 'lr': lr_md,
         'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed}
     args_imd = {'m': m, 'd': d, 'condition': condition, 'sigma': sigma, 'lr': lr_md,
-        'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
+         'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
 
     path = './saved_items/cond_' + str(condition) + 'd_'+ str(d)
     if not os.path.exists(path):

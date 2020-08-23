@@ -193,7 +193,7 @@ def run_MD(M: int, d: int, batch_size: int, condition: float, sigma: float, lr: 
     return iters
 
 def run_IMD(M: int, d: int, batch_size: int, condition: float, sigma: float, lr: float,
-            eps=1, max_iters=1000, num_particles=5, decreasing_lr=False, seed=None):
+            max_iters=1000, num_particles=5, decreasing_lr=False, seed=None):
     """Runs Interacting Mirror Descent Optimisation for Equation (5.4) of the project:
 
         \min_{x \in Simplex} 1 / M \sum_{m=1}^M f_m(x)
@@ -215,8 +215,6 @@ def run_IMD(M: int, d: int, batch_size: int, condition: float, sigma: float, lr:
         Noise parameter. If sigma > 0 then optimisation is Stochastic.
     lr : float
         Learning Rate.
-    eps : float
-        Discretisation parameter.
     max_iters : int
         Number of iterations to run optimisation.
     num_particles : int
@@ -287,7 +285,7 @@ def run_IMD(M: int, d: int, batch_size: int, condition: float, sigma: float, lr:
                 if decreasing_lr:
                     lr_const = 1 / np.sqrt(t + 1).item()
 
-                x_p = x_p * torch.exp(- lr * lr_const * eps * system.gradient).reshape(-1)
+                x_p = x_p * torch.exp(- lr * lr_const * system.gradient).reshape(-1)
 
                 x_p /= torch.sum(x_p)
 
@@ -303,7 +301,6 @@ def run_IMD(M: int, d: int, batch_size: int, condition: float, sigma: float, lr:
 
 if __name__ == "__main__":
     sigma = 1
-    eps = 1
     max_iters = 1000
     M = 100
     d = 500
@@ -318,7 +315,7 @@ if __name__ == "__main__":
     args = {'M': M, 'd': d, 'batch_size': batch_size, 'condition': condition, 'sigma': sigma, 'lr': lr,
         'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed}
     args_imd = {'M': M, 'd': d, 'batch_size': batch_size, 'condition': condition, 'sigma': sigma, 'lr': lr,
-        'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
+        'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
 
     path = './saved_items/cond_' + str(condition)
     if not os.path.exists(path):
@@ -341,7 +338,7 @@ if __name__ == "__main__":
     # Variable Np
     for num_particles in [1, 5, 10, 20, 50, 100]:
         args_imd = {'M': M, 'd': d, 'batch_size': batch_size, 'condition': condition, 'sigma': sigma, 'lr': lr,
-            'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
+            'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
 
 
         losses_imd = run_IMD(**args_imd)
@@ -358,7 +355,7 @@ if __name__ == "__main__":
     # batch_size = 5
     # num_particles = 10
     # args_imd = {'M': M, 'd': d, 'batch_size': batch_size, 'condition': condition, 'sigma': sigma, 'lr': lr,
-    #     'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
+    #     'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
     #
     # losses_imd = run_IMD(**args_imd)
     # save_obj((losses_imd, args_imd), path + '/IMD_Np_{}_iters_{}_M_{}_batch_{}'.format(num_particles, max_iters, M, batch_size))
@@ -367,7 +364,7 @@ if __name__ == "__main__":
     # batch_size = 5
     # num_particles = 1
     # args_imd = {'M': M, 'd': d, 'batch_size': batch_size, 'condition': condition, 'sigma': sigma, 'lr': lr,
-    #     'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
+    #      'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
     #
     # losses_imd = run_IMD(**args_imd)
     # save_obj((losses_imd, args_imd), path + '/IMD_Np_{}_iters_{}_M_{}_batch_{}'.format(num_particles, max_iters, M, batch_size))
@@ -376,7 +373,7 @@ if __name__ == "__main__":
     # batch_size = 10
     # num_particles = 1
     # args_imd = {'M': M, 'd': d, 'batch_size': batch_size, 'condition': condition, 'sigma': sigma, 'lr': lr,
-    #     'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
+    #      'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
     #
     # losses_imd = run_IMD(**args_imd)
     # save_obj((losses_imd, args_imd), path + '/IMD_Np_{}_iters_{}_M_{}_batch_{}'.format(num_particles, max_iters, M, batch_size))
@@ -385,7 +382,7 @@ if __name__ == "__main__":
     # batch_size = 10
     # num_particles = 10
     # args_imd = {'M': M, 'd': d, 'batch_size': batch_size, 'condition': condition, 'sigma': sigma, 'lr': lr,
-    #     'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
+    #      'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
     #
     # losses_imd = run_IMD(**args_imd)
     # save_obj((losses_imd, args_imd), path + '/IMD_Np_{}_iters_{}_M_{}_batch_{}'.format(num_particles, max_iters, M, batch_size))
@@ -393,7 +390,7 @@ if __name__ == "__main__":
     # batch_size = 15
     # num_particles = 1
     # args_imd = {'M': M, 'd': d, 'batch_size': batch_size, 'condition': condition, 'sigma': sigma, 'lr': lr,
-    #     'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
+    #      'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
     #
     # losses_imd = run_IMD(**args_imd)
     # save_obj((losses_imd, args_imd), path + '/IMD_Np_{}_iters_{}_M_{}_batch_{}'.format(num_particles, max_iters, M, batch_size))
@@ -402,7 +399,7 @@ if __name__ == "__main__":
     # batch_size = 15
     # num_particles = 10
     # args_imd = {'M': M, 'd': d, 'batch_size': batch_size, 'condition': condition, 'sigma': sigma, 'lr': lr,
-    #     'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
+    #      'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
     #
     # losses_imd = run_IMD(**args_imd)
     # save_obj((losses_imd, args_imd), path + '/IMD_Np_{}_iters_{}_M_{}_batch_{}'.format(num_particles, max_iters, M, batch_size))
@@ -411,7 +408,7 @@ if __name__ == "__main__":
     # batch_size = 30
     # num_particles = 10
     # args_imd = {'M': M, 'd': d, 'batch_size': batch_size, 'condition': condition, 'sigma': sigma, 'lr': lr,
-    #     'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
+    #      'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
     #
     # losses_imd = run_IMD(**args_imd)
     # save_obj((losses_imd, args_imd), path + '/IMD_Np_{}_iters_{}_M_{}_batch_{}'.format(num_particles, max_iters, M, batch_size))
@@ -419,7 +416,7 @@ if __name__ == "__main__":
     # batch_size = 50
     # num_particles = 5
     # args_imd = {'M': M, 'd': d, 'batch_size': batch_size, 'condition': condition, 'sigma': sigma, 'lr': lr,
-    #     'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
+    #      'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
     #
     # losses_imd = run_IMD(**args_imd)
     # save_obj((losses_imd, args_imd), path + '/IMD_Np_{}_iters_{}_M_{}_batch_{}'.format(num_particles, max_iters, M, batch_size))
@@ -427,7 +424,7 @@ if __name__ == "__main__":
     # batch_size = M
     # num_particles = 1
     # args_imd = {'M': M, 'd': d, 'batch_size': batch_size, 'condition': condition, 'sigma': sigma, 'lr': lr,
-    #     'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
+    #      'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed}
     #
     # losses_imd = run_IMD(**args_imd)
     # save_obj((losses_imd, args_imd), path + '/IMD_Np_{}_iters_{}_M_{}_batch_{}'.format(num_particles, max_iters, M, batch_size))

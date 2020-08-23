@@ -226,7 +226,7 @@ def run_MD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float,
     return iters, kmodes
 
 def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float, cluster_random_state: int,
-        sigma: float, lr: float, eps=1, max_iters=1000, num_particles=5, decreasing_lr=False, seed=None, mode='blobs'):
+        sigma: float, lr: float,  max_iters=1000, num_particles=5, decreasing_lr=False, seed=None, mode='blobs'):
 
     """Runs Interacting Mirror Descent Optimisation for Equation (5.7) of the project:
 
@@ -258,8 +258,6 @@ def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float
         Noise parameter. If sigma > 0 then optimisation is Stochastic.
     lr : float
         Learning Rate.
-    eps : float
-        Descritisation parameter.
     max_iters : type
         Description of parameter `max_iters`.
     num_particles : int
@@ -341,7 +339,7 @@ def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float
                 if decreasing_lr:
                     lr_const = 1 / np.sqrt(t + 1).item()
 
-                Z_p = Z_p * torch.exp(- lr * lr_const * eps * kmodes.gradient)
+                Z_p = Z_p * torch.exp(- lr * lr_const * kmodes.gradient)
 
                 Z_p /= torch.sum(Z_p,1).reshape(-1,1)
 
@@ -355,7 +353,7 @@ def run_IMD(N: int, D: int, K: int, lambd: float, var: float, cluster_std: float
     return iters, kmodes
 
 if __name__ == "__main__":
-    eps = 1
+
     max_iters = 10
     N = 100
     D = 2
@@ -379,7 +377,7 @@ if __name__ == "__main__":
     args_md = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
         'sigma': sigma, 'lr': lr_md, 'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
     args_imd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
-        'sigma': sigma, 'lr': lr_imd, 'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
+        'sigma': sigma, 'lr': lr_imd, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
 #
 #     path = './saved_items/N_{}_D_{}_K_{}_lambda_{}_var_{}_clusterstd_{}/'.format(N, D, K, lambd, var, cluster_std)
 #

@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
 
-    eps = 1
     max_iters = 50
     N = 2000
     D = 3
@@ -29,7 +28,7 @@ if __name__ == "__main__":
     args_md = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
         'sigma': sigma, 'lr': lr_md,  'max_iters': max_iters, 'Niid': Niid, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
     args_imd = {'N': N, 'D': D, 'K': K, 'lambd': lambd, 'var': var, 'cluster_std': cluster_std, 'cluster_random_state': cluster_random_state,
-        'sigma': sigma, 'lr': lr_imd, 'eps': eps, 'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
+        'sigma': sigma, 'lr': lr_imd,  'max_iters': max_iters, 'num_particles': num_particles, 'decreasing_lr': decreasing_lr, 'seed': seed, 'mode': mode}
 
 
     path = './saved_items/N_{}_D_{}_K_{}_lambda_{}_var_{}_clusterstd_{}_{}/'.format(N, D, K, lambd, var, cluster_std, mode)
