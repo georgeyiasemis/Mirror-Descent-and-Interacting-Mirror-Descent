@@ -6,3 +6,5 @@ All three optimisation frameworks are contained in ``\run_opt.py``. The function
 ## References
 
 *  Anastasia Borovykh, Nikolas Kantas, Panos Parpas, and Grigorios A. Pavliotis. *On stochastic mirror descent with interacting particles:  convergence properties and variance reduction*, 2020.
+
+* Panayotis Mertikopoulos and Mathias Staudigl.  *On the convergence of gradient-like flows with noisy gradient input*, SIAM Journal on Optimization, 28:163–197,01 2018. 
