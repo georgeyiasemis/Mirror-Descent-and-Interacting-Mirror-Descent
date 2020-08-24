@@ -240,18 +240,18 @@ def run_IMD(graph_filename: str, path_filename: str, sigma: float,
     return iters
 
 if __name__ == "__main__":
-    path = './saved_items/50Nodes/'
-    graph_filename = path + 'graph_N50_cutoff5'
+    path = './saved_items/100Nodes/'
+    graph_filename = path + 'graph_N100_cutoff7'
     path_filename = graph_filename + 'paths'
 
 
-    sigma = 0.0
+    sigma = 0.1
     lr = 0.01
-    lr_md = 0.2
-    Niid = 5
+    lr_md = 0.5
+    Niid = 2
     max_iters = 500
-    num_particles = 5
-    decreasing_lr = False
+    num_particles = 2
+    decreasing_lr = True
     seed = 0
 
     path = path + 'Results/' + graph_filename[-7:]
@@ -267,11 +267,11 @@ if __name__ == "__main__":
 
 
     losses_imd = run_IMD(**args_imd)
-    # save_obj((losses_imd, args_imd), path + '/IMD_Np_' + str(num_particles) + '_iters_' + str(max_iters))
+    save_obj((losses_imd, args_imd), path + '/IMD_Np_' + str(num_particles) + '_iters_' + str(max_iters) + '_dec_lr_' + str(lr_md))
     losses_gd = run_GD(**args_gd)
-    # save_obj((losses_gd, args_gd), path + '/GD_Niid_' + str(Niid) + '_iters_' + str(max_iters))
+    save_obj((losses_gd, args_gd), path + '/GD_Niid_' + str(Niid) + '_iters_' + str(max_iters) + '_dec_lr_' + str(lr))
     losses_md = run_MD(**args_md)
-    # save_obj((losses_md, args_md), path + '/MD_Niid_' + str(Niid) + '_iters_' + str(max_iters))
+    save_obj((losses_md, args_md), path + '/MD_Niid_' + str(Niid) + '_iters_' + str(max_iters) + '_dec_lr_' + str(lr_md))
 
 
     # losses_imd = run_IMD(**args_imd)
