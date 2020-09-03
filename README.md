@@ -1,6 +1,6 @@
 <!-- # Mirror Descent Optimisation -->
 This repository hosts the code submitted as part my Individual Project for the
-**MSc in Artificial Intelligence**(MSc AI) at **Imperial College London**. All code is written in Python3.
+**MSc in Artificial Intelligence** (MSc AI) at **Imperial College London**. All code is written in Python3.
 <!--For all the dependencies refer to the relevant paragraph of the README file.-->
 
 # Mirror Descent and Interacting Mirror Descent for almost dimension-free optimisation on non-Euclidean spaces
