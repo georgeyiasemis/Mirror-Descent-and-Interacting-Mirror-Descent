@@ -124,7 +124,7 @@ def run_INLA(d: int, epsilon: float, max_iters: int, num_particles: int):
                 x_p = particles[:, p]
                 x_p = (1 - 2*epsilon) * x_p + np.sqrt(2 * epsilon) * torch.pow(Sigma, 1/2) @ torch.randn(d)
 
-                x_p += interaction_mat[p,:] @ particles.T
+                x_p += epsilon * interaction_mat[p,:] @ particles.T
 
                 X[t,:,p] = x_p
 
@@ -159,9 +159,9 @@ if __name__ == '__main__':
 
     args_INLA = {'d': d, 'epsilon': epsilon, 'max_iters': max_iters, 'num_particles': num_particles}
 
-    iters_NLA = run_NLA(**args_NLA)
+    # iters_NLA = run_NLA(**args_NLA)
 
     iters_INLA = run_INLA(**args_INLA)
 
-    torch.save([iters_NLA, args_NLA], './saved_items/d_100/iters_NLA.pkl')
+    # torch.save([iters_NLA, args_NLA], './saved_items/d_100/iters_NLA.pkl')
     torch.save([iters_INLA, args_INLA], './saved_items/d_100/iters_INLA.pkl')
