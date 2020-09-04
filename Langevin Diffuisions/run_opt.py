@@ -159,9 +159,9 @@ if __name__ == '__main__':
 
     args_INLA = {'d': d, 'epsilon': epsilon, 'max_iters': max_iters, 'num_particles': num_particles}
 
-    # iters_NLA = run_NLA(**args_NLA)
+    iters_NLA = run_NLA(**args_NLA)
 
     iters_INLA = run_INLA(**args_INLA)
 
-    # torch.save([iters_NLA, args_NLA], './saved_items/d_100/iters_NLA.pkl')
+    torch.save([iters_NLA, args_NLA], './saved_items/d_100/iters_NLA.pkl')
     torch.save([iters_INLA, args_INLA], './saved_items/d_100/iters_INLA.pkl')
